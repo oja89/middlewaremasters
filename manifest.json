@@ -8,11 +8,14 @@
 
 "applications": {
   "gecko": {
+    //here we can put some fancy id. seems to need an email format
     "id": "middleware@master.extension"
     }
 },
 
   "icons": {
+    //these are the icons for the extension
+    //is shown in the about:debugging at least
     "48": "icons/border-48.png"
   },
 
@@ -21,9 +24,10 @@
       //"matches": ["*://*.mozilla.org/*"],
       //testing
       "matches": ["*://*.youtube.com/*"],
+      //this should make the script run only on youtube pages
       "js": ["middlewaremasters.js"]
       //"js": ["middlewaremasters.js", "button.js"] 
-      //while running here, teh button doesnt work
+      //while running here, the button doesnt work
     }
   ],
 
@@ -34,6 +38,7 @@
  
   "browser_action": {
     "default_icon": {
+      //this adds the icon to browser
       "16": "icons/page-16.png"
      }
    }
