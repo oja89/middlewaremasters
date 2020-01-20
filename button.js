@@ -5,6 +5,9 @@ function iconButton() {
     //console.log("Button pressed");
     
     //try to control the video
+    //these dont work here
+    //but if you press F12 in firefox those strings work...
+    //something is missing
     $('video').play();
     $('video').pause();
     $('video').getDuration();
