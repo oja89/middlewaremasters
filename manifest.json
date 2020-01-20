@@ -1,0 +1,42 @@
+{
+
+  "manifest_version": 2,
+  "name": "middlewaremasters",
+  "version": "1.0",
+
+  "description": "Trying to control YT with extension.",
+
+"applications": {
+  "gecko": {
+    "id": "middleware@master.extension"
+    }
+},
+
+  "icons": {
+    "48": "icons/border-48.png"
+  },
+
+  "content_scripts": [
+    {
+      //"matches": ["*://*.mozilla.org/*"],
+      //testing
+      "matches": ["*://*.youtube.com/*"],
+      "js": ["middlewaremasters.js"]
+      //"js": ["middlewaremasters.js", "button.js"] 
+      //while running here, teh button doesnt work
+    }
+  ],
+
+    //while running on background, seems that logs dont work?
+  "background": {
+    "scripts": ["button.js"]
+  },
+ 
+  "browser_action": {
+    "default_icon": {
+      "16": "icons/page-16.png"
+     }
+   }
+
+
+}
