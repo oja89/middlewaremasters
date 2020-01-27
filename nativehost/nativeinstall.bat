@@ -1,0 +1,1 @@
+REG ADD "HKCU\Software\Google\Chrome\NativeMessagingHosts\sd.client" /ve /t REG_SZ /d "%~dp0sd.client.json" /f

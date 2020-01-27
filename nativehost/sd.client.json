@@ -1,0 +1,9 @@
+{
+    "name": "sd.client",
+    "description": "Broadcasts node's existence",
+    "path": "sd-client.bat",
+    "type": "stdio",
+    "allowed_origins": [
+      "chrome-extension://chkgfjgbfekhcgdpjodgmjbdnidadmeg/"
+    ]
+  }

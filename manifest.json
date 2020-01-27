@@ -1,12 +1,13 @@
 {
-
+  // Extension ID: chkgfjgbfekhcgdpjodgmjbdnidadmeg
   "manifest_version": 2,
   "name": "middlewaremasters",
   "version": "1.0",
 
   "description": "Trying to control YT with extension.",
   "permissions": [
-    "activeTab"
+    "activeTab",
+    "nativeMessaging"
   ],
 
   "icons": {
