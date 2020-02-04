@@ -6,7 +6,9 @@
 
   "description": "Trying to control YT with extension.",
   "permissions": [
-    "activeTab"
+    "activeTab",
+    "tabs", "<all_urls>",
+    "webNavigation"
   ],
 
   "icons": {
@@ -16,6 +18,13 @@
   "background": {
     "scripts": ["background.js"]
   },
+
+  "content_scripts": [
+    {
+      "matches": ["https://*.youtube.com/*"],
+      "js": ["scripts/toggle.js"]
+    }
+  ],
  
   "browser_action": {
     "default_icon": {
