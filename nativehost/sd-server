@@ -1,0 +1,38 @@
+#!/usr/bin/env python
+
+import socket
+import struct
+import sys
+import json
+
+#Multicast address and port have to match with servicediscovery_client.py on other units
+MCAST_ADDR = "224.1.1.1"
+MCAST_PORT = 5008
+
+if sys.platform == "win32":
+    import os, msvcrt
+    msvcrt.setmode(sys.stdin.fileno(), os.O_BINARY)
+    msvcrt.setmode(sys.stdout.fileno(), os.O_BINARY)
+
+def listen_socket():
+    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
+    sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    sock.bind(("", MCAST_PORT))
+    mreq = struct.pack("4sl", socket.inet_aton(MCAST_ADDR), socket.INADDR_ANY)
+    sock.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, mreq)
+    return sock
+
+def send_message(message):
+    encodedMessage = json.dumps(message).encode('utf-8')
+    # Write message size.
+    sys.stdout.buffer.write(struct.pack('@I', len(encodedMessage)))
+    # Write the message itself.
+    sys.stdout.buffer.write(encodedMessage)
+    sys.stdout.buffer.flush()
+
+sock = listen_socket()
+
+while True:
+    data, client = sock.recvfrom(10240)
+    data = data.decode("utf-8")
+    send_message(data)

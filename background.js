@@ -8,14 +8,18 @@ chrome.browserAction.onClicked.addListener(function(tab) {
 
 var backpage = chrome.extension.getBackgroundPage();
 backpage.console.log("Alotettu");
-function msgGot() {
+
+function msgGot(message) {
   backpage.console.log("Pyyttonilta viesti");
+  return true;
 }
 
-function connectToClient() {
-  var nativehost = "sd.client";
+function connectToServer() {
+  var nativehost = "sd.server";
   port = chrome.runtime.connectNative(nativehost);
   port.onMessage.addListener(msgGot);
 }
 
-connectToClient()
+
+
+connectToServer()

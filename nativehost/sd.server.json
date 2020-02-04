@@ -4,9 +4,9 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file. 
 {
-    "name": "sd.client",
-    "description": "Broadcasts node's existence",
-    "path": "sd-client.bat",
+    "name": "sd.server",
+    "description": "Listens for multicast broadcasts",
+    "path": "sd-server.bat",
     "type": "stdio",
     "allowed_origins": [
       "chrome-extension://chkgfjgbfekhcgdpjodgmjbdnidadmeg/"

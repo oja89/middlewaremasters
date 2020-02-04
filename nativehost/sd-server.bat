@@ -6,4 +6,4 @@
 :: found in the LICENSE file. 
 
 :: Simple batch script which starts the python service discovery client if in same folder
-python "%~dp0/sd-client" %*
+python "%~dp0/sd-server" %*
