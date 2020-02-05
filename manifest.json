@@ -1,5 +1,4 @@
 {
-
   "manifest_version": 2,
   "name": "middlewaremasters",
   "version": "1.0",
@@ -8,7 +7,8 @@
   "permissions": [
     "activeTab",
     "tabs", "<all_urls>",
-    "webNavigation"
+    "webNavigation",
+    "nativeMessaging"
   ],
 
   "icons": {
@@ -16,7 +16,7 @@
   },
 
   "background": {
-    "scripts": ["background.js"]
+    "scripts": ["background.js", "scripts/ytsdiscovery.js"]
   },
 
   "content_scripts": [

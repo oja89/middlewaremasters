@@ -1,0 +1,24 @@
+#!/usr/bin/env python
+
+print("alko")
+
+import socket
+import time
+
+MCAST_ADDR = "224.1.1.1"
+MCAST_PORT = 5008
+
+MULTICAST_TTL = 8
+
+TOKEN = "testitest2"
+
+def service_discovery():
+    
+    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
+    sock.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_TTL, MULTICAST_TTL)
+    while True:
+        print("Multicasting...")
+        sock.sendto(TOKEN.encode("utf-8"), (MCAST_ADDR, MCAST_PORT))
+        time.sleep(1)
+
+service_discovery()
