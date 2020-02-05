@@ -10,5 +10,10 @@ function call(message, sender, sendresponse) {
             video.pause()
         }
     }
+    if (message == "skip") {
+        let time = 10 //time in seconds?
+        video.currentTime = time; //skip somewhere
+    }
+    
 }
 
