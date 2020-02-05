@@ -1,8 +1,8 @@
 //making this work with chrome first
 chrome.browserAction.onClicked.addListener(function(tab) {
-  let message = "skip"; 
+  let message = "toggle"; 
   
-  //conffed messages: "toggle", "skip"
+  //conffed messages: "toggle", "skip" "speed"
   //todo: add more buttons maybe...
 
   chrome.tabs.query({active: true,currentWindow:true},function(tabs){
