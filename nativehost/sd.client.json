@@ -9,6 +9,6 @@
     "path": "sd-client.bat",
     "type": "stdio",
     "allowed_origins": [
-      "chrome-extension://chkgfjgbfekhcgdpjodgmjbdnidadmeg/"
+      "chrome-extension://hkkmkkadhkpbgnecfmebieppmeenefgg/"
     ]
   }

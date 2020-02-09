@@ -14,6 +14,13 @@ if sys.platform == "win32":
     msvcrt.setmode(sys.stdin.fileno(), os.O_BINARY)
     msvcrt.setmode(sys.stdout.fileno(), os.O_BINARY)
 
+def get_dev_ipaddr():
+    testsock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    testsock.connect(("8.8.8.8", 80))
+    ipaddr = testsock.getsockname()[0]
+    testsock.close()
+    return ipaddr
+
 def listen_socket():
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
     sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -23,6 +30,7 @@ def listen_socket():
     return sock
 
 def send_message(message):
+    #Modified from https://github.com/mdn/webextensions-examples/tree/master/native-messaging
     encodedMessage = json.dumps(message).encode('utf-8')
     # Write message size.
     sys.stdout.buffer.write(struct.pack('@I', len(encodedMessage)))
@@ -30,9 +38,43 @@ def send_message(message):
     sys.stdout.buffer.write(encodedMessage)
     sys.stdout.buffer.flush()
 
+
+ownip = get_dev_ipaddr()
 sock = listen_socket()
+sock.setblocking(False)
+
+#Create objects for data
+nodes = {}
+session = False
 
 while True:
-    data, client = sock.recvfrom(10240)
-    data = data.decode("utf-8")
-    send_message(data)
+    try:
+        data, client = sock.recvfrom(10240)
+        data = data.decode("utf-8")
+
+    except BlockingIOError:
+        #No message in buffer
+        print("No message")
+        #Add logic here
+
+        #send_message()
+    else:
+        #Message was in buffer
+        sessionid, obj = data.split(";", 1)
+        if not session:
+            if client == ownip:
+                session = sessionid
+            else:
+                continue
+        if sessionid != session:
+            continue
+        json_obj = json.loads(obj)
+        try:
+            nodecmd = json_obj["command"]
+            #TODO: Implement commands here
+            nodes[client] = json_obj
+        except KeyError:
+            #No commands
+            nodes[client] = json_obj
+        continue
+        
