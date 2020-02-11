@@ -10,7 +10,7 @@ var backpage = chrome.extension.getBackgroundPage();
 backpage.console.log("Alotettu");
 
 function msgGot(message) {
-  backpage.console.log("Pyyttonilta viesti");
+  backpage.console.log(message);
   return true;
 }
 

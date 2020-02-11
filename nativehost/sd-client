@@ -10,7 +10,7 @@ MCAST_PORT = 5008
 
 MULTICAST_TTL = 8
 
-TOKEN = "testitest2"
+TOKEN = "testi;testi2"
 
 def service_discovery():
     

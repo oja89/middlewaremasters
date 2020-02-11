@@ -4,6 +4,7 @@ import socket
 import struct
 import sys
 import json
+import time
 
 #Multicast address and port have to match with servicediscovery_client.py on other units
 MCAST_ADDR = "224.1.1.1"
@@ -41,7 +42,7 @@ def send_message(message):
 
 ownip = get_dev_ipaddr()
 sock = listen_socket()
-sock.setblocking(False)
+sock.settimeout(0.01)
 
 #Create objects for data
 nodes = {}
@@ -52,15 +53,21 @@ while True:
         data, client = sock.recvfrom(10240)
         data = data.decode("utf-8")
 
-    except BlockingIOError:
+    except socket.timeout:
         #No message in buffer
-        print("No message")
+        #print("No message")
         #Add logic here
-
+        time.sleep(0.1)
+        continue
         #send_message()
     else:
         #Message was in buffer
-        sessionid, obj = data.split(";", 1)
+        try:
+            sessionid, obj = data.split(";", 1)
+        except ValueError:
+            #Invalid message
+            continue
+        send_message(client)
         if not session:
             if client == ownip:
                 session = sessionid
