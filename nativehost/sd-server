@@ -42,7 +42,7 @@ def send_message(message):
 
 ownip = get_dev_ipaddr()
 sock = listen_socket()
-sock.settimeout(0.01)
+sock.setblocking(0)
 
 #Create objects for data
 nodes = {}
@@ -53,7 +53,7 @@ while True:
         data, client = sock.recvfrom(10240)
         data = data.decode("utf-8")
 
-    except socket.timeout:
+    except BlockingIOError:
         #No message in buffer
         #print("No message")
         #Add logic here
