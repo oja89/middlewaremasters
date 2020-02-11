@@ -2,19 +2,19 @@ chrome.runtime.onMessage.addListener(call);
 //this function should give the statuses in a json object format
 function call(message, sender, sendresponse) {
     console.log(sender.id) 
-    console.log("msg is: " + message)
+    //console.log("msg is: " + message)
     if (message == "status") {
+        //get the video. from the elements
+        let video = document.getElementsByTagName("video")[0];
                 //run the status function
                 //show the object in log
-                console.log(getStatus())
+                console.log(getStatus(video))
     }
+    else {console.log("msg unknown: " + message)}
 }
 
-function getStatus() {
-    //get the video. from the elements
-    var video = document.getElementsByTagName("video")[0];
-    //set empty status object, set also some defaults just in case
-    //use the same "commands" as video. for clarity
+function getStatus(video) {
+    //use the same "commands" as the video commands for clarity plz
     var status = {}
     status.src = video.src
     console.log("?url: " + status.src)
@@ -24,6 +24,6 @@ function getStatus() {
     console.log("?time: " + status.currentTime)
     status.playbackRate = video.playbackRate
     console.log("?speed: " + status.playbackRate)
-    //return the object
+    //return the object?
     return status
 }
