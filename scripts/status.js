@@ -4,29 +4,31 @@ function call(message, sender, sendresponse) {
     console.log(sender.id) 
     console.log("msg is: " + message)
     if (message == "status") {
-        
-            if (message == "status") {
                 //run the status function
-                getStatus()
-            }
+                //show the object in log
+                console.log(getStatus())
     }
 }
 
 function getStatus() {
     //get the video. from the elements
     var video = document.getElementsByTagName("video")[0];
-    //set empty status object
+    //set empty status object, set also some defaults just in case
+    //use the same "commands" as video. for clarity
     var status = {
+        src: "value0",
         paused: "value1",
         currentTime: "value2",
         speed: "value3"
     }
-    //set default
+    status.src = video.src
+    console.log("?url: " + status.src)
     status.paused = video.paused
     console.log("?paused: " + status.paused)
     status.currentTime = video.currentTime
     console.log("?time: " + status.currentTime)
     status.playbackRate = video.playbackRate
     console.log("?speed: " + status.playbackRate)
-    console.log(status)
+    //return the object
+    return status
 }
