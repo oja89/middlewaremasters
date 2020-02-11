@@ -15,12 +15,7 @@ function getStatus() {
     var video = document.getElementsByTagName("video")[0];
     //set empty status object, set also some defaults just in case
     //use the same "commands" as video. for clarity
-    var status = {
-        src: "value0",
-        paused: "value1",
-        currentTime: "value2",
-        speed: "value3"
-    }
+    var status = {}
     status.src = video.src
     console.log("?url: " + status.src)
     status.paused = video.paused
