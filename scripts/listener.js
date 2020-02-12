@@ -36,6 +36,9 @@ function call(message, sender, sendresponse) {
         else {console.log("msg unknown: " + message)}
    // }
 }
+
+//this toggling is not really useful in the actual extension
+//works for testing though
 function toggle(video, value) {
     if (video.paused == true) {
         video.play();
@@ -47,11 +50,13 @@ function toggle(video, value) {
     }
 }
 
+//skip to a time
 function skip(video, value) {
     video.currentTime = value; //skip somewhere
     console.log("!skip to: " + value)
 }
 
+//change playbackspeed to something
 function speed(video, value) {
     video.playbackRate = value
     console.log("!speed to: " + value)

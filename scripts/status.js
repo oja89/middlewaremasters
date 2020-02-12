@@ -24,6 +24,12 @@ function getStatus(video) {
     console.log("?time: " + status.currentTime)
     status.playbackRate = video.playbackRate
     console.log("?speed: " + status.playbackRate)
+
+    //more experimental things
+    status.readyState = video.readyState
+
+
+    
     //return the object?
     return status
 }
