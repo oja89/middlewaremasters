@@ -1,14 +1,20 @@
 #!/usr/bin/env python
 
+import collections
 import socket
 import struct
 import sys
 import json
 import time
 
-#Multicast address and port have to match with servicediscovery_client.py on other units
 MCAST_ADDR = "224.1.1.1"
 MCAST_PORT = 5008
+MULTICAST_TTL = 8
+
+PAUSE = 0
+PLAY = 1
+JUMPTO = 2
+GOTOURL = 3
 
 if sys.platform == "win32":
     import os, msvcrt
@@ -47,16 +53,22 @@ sock.setblocking(0)
 #Create objects for data
 nodes = {}
 session = False
+nodecommands = collections.defaultdict(list)
 
 while True:
     try:
         data, client = sock.recvfrom(10240)
         data = data.decode("utf-8")
+        #print(data)
+        #sock.sendto("Viesti saatu joten vastataan HÖHÖ".encode("utf-8"), (MCAST_ADDR, MCAST_PORT))
 
     except BlockingIOError:
         #No message in buffer
         #print("No message")
-        #Add logic here
+        #TODO: Add logic here
+
+        
+
         time.sleep(0.1)
         continue
         #send_message()
@@ -67,7 +79,8 @@ while True:
         except ValueError:
             #Invalid message
             continue
-        send_message(client)
+        #send_message(client)
+
         if not session:
             if client == ownip:
                 session = sessionid
@@ -75,11 +88,17 @@ while True:
                 continue
         if sessionid != session:
             continue
+
         json_obj = json.loads(obj)
         try:
             nodecmd = json_obj["command"]
             #TODO: Implement commands here
-            nodes[client] = json_obj
+            if client not in nodecommands[nodecmd]:
+                nodecommands[nodecmd].append(client) #Check length of this list for agreement between nodes
+            
+            
+            
+
         except KeyError:
             #No commands
             nodes[client] = json_obj
