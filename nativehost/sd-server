@@ -65,10 +65,16 @@ while True:
     except BlockingIOError:
         #No message in buffer
         #print("No message")
-        #TODO: Add logic here
+        #TODO: Add application logic here
 
+        #Check status of nodecommands
+        #if this node has to do something, send message to extension
+
+        #Check status of nodes
+        #if logic dictates a node needs to do something, send message using socket to all nodes
         
 
+        #Application logic finished, check socket buffer again
         time.sleep(0.1)
         continue
         #send_message()
@@ -92,15 +98,14 @@ while True:
         json_obj = json.loads(obj)
         try:
             nodecmd = json_obj["command"]
-            #TODO: Implement commands here
+            #Commands are added to object here
             if client not in nodecommands[nodecmd]:
-                nodecommands[nodecmd].append(client) #Check length of this list for agreement between nodes
+                if len(nodecommands[nodecmd]) == 0:
+                    nodecommands[nodecmd].append(time.time) #first timestamp, if this is too old remove commands
+                nodecommands[nodecmd].append(client) #Check length of this list for agreement between nodes, length is amount of nodes + 1
             
-            
-            
-
         except KeyError:
-            #No commands
+            #No commands, json is the latest status of a node
             nodes[client] = json_obj
         continue
         
