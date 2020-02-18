@@ -72,6 +72,8 @@ while True:
 
         #Check status of nodes
         #if logic dictates a node needs to do something, send message using socket to all nodes
+        swarmsize = len(nodes) #how many nodes in group
+        
         
 
         #Application logic finished, check socket buffer again
