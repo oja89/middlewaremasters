@@ -63,16 +63,50 @@ while True:
         #sock.sendto("Viesti saatu joten vastataan HÖHÖ".encode("utf-8"), (MCAST_ADDR, MCAST_PORT))
 
     except BlockingIOError:
+        swarmsize = len(nodes) #how many nodes in group
         #No message in buffer
         #print("No message")
         #TODO: Add application logic here
 
         #Check status of nodecommands
         #if this node has to do something, send message to extension
-
+        for cmd in nodecommands:
+            if (len(cmd) - 1 > swarmsize / 2):
+                if (cmd.split(";")[0] == ownip):
+                    send_message(cmd.split(";", 1)[1])       
+                nodecommands.pop(cmd)
         #Check status of nodes
         #if logic dictates a node needs to do something, send message using socket to all nodes
-        swarmsize = len(nodes) #how many nodes in group
+
+        #Check the video URL
+        videos = []
+        vid_dict = {}
+        for key in nodes.keys():
+            video = nodes[key]["video_url"]
+            videos.append((video, key))
+           
+            if video not in vid_dict:
+                vid_dict[video] = 1
+            else: 
+                vid_dict[video] += 1
+        if len(vid_dict) > 1:
+            max_amount = -9999
+            for key in vid_dict.keys():
+                amount = vid_dict[key]
+                max_amount = max(amount, max_amount)
+                if max_amount == vid_dict[key]:
+                    real_vid = key
+            for key in nodes.keys():
+                if nodes[key]['video'] != real_vid:
+                    sock.sendto((sessionid + ";" + key + ";" + str(JUMPTO) + ";" + real_vid).encode("utf-8"), (MCAST_ADDR, MCAST_PORT))
+                
+
+
+            
+        
+
+
+        
         
         
 
