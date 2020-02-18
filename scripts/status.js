@@ -16,7 +16,7 @@ function call(message, sender, sendresponse) {
 function getStatus(video) {
     //use the same "commands" as the video commands for clarity plz
     var status = {}
-    status.src = video.src
+    status.src = video.src //this is not same if different url
     console.log("?url: " + status.src)
     status.paused = video.paused
     console.log("?paused: " + status.paused)
@@ -27,7 +27,7 @@ function getStatus(video) {
 
     //more experimental things
     status.readyState = video.readyState
-
+    status.baseURI = video.baseURI
 
     
     //return the object?
