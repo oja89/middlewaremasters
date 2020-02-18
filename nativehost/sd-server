@@ -99,6 +99,34 @@ while True:
             for key in nodes.keys():
                 if nodes[key]['video'] != real_vid:
                     sock.sendto((sessionid + ";" + key + ";" + str(JUMPTO) + ";" + real_vid).encode("utf-8"), (MCAST_ADDR, MCAST_PORT))
+
+        #Check the video timestamps
+        timestamps = []
+        for key in nodes.keys():
+            timestamps.append(nodes[key]['timestamp'])
+
+        #Only do something if the difference between different timestamps is over 3 seconds
+        
+        if max(timestamps) - min(timestamps) > 3:
+
+            #Average of the timestamps
+            avr_timestamp = sum(timestamps) / len(timestamps)
+            distances = []
+            #The node with the minimum distance to the average timestamp is "in the right timespot" 
+            for key in nodes.keys():
+                distance_timestamp = nodes[key]['timestamp'] - avr_timestamp
+                distances.append((distance_timestamp, key))
+                real_node = min(distances, key = lambda t: t[0])
+            #If a node is over 3 seconds away from the "correct timestamp", multicast
+            for key in nodes.keys():
+                if real_node[0] - nodes[key]['timestamp'] > 3:
+                    sock.sendto((sessionid + ";" + key + ";" + str(JUMPTO) + ";" + real_node[0]).encode("utf-8"), (MCAST_ADDR, MCAST_PORT))
+
+                    
+                
+
+
+            
                 
 
 
