@@ -1,10 +1,9 @@
 //something info which should be read in the popup-fields maybe?
 var currentid = "fjlfj"
 
-
-
 //The button configurations and functions start here
-//actual sending here
+//actual sending to the content script listeners here
+
 function sendMessage(message) {
   chrome.tabs.query({active: true,currentWindow:true},function(tabs){
     chrome.tabs.sendMessage(tabs[0].id,message);
