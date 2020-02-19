@@ -22,9 +22,17 @@ function call(message, sender, sendresponse) {
     console.log(value)
 
     let video = document.getElementsByTagName("video")[0];
+        //toggle isnt needed
         if (command == "toggle") {
             toggle(video)
         }
+        if (command == "play") {
+            play(video)
+        }
+        if (command == "pause") {
+            pause(video)
+        }
+
         if (command == ("skip")) {
             //let value = 10 //time in seconds? this should be in message too
             skip(video, value)
@@ -48,6 +56,16 @@ function toggle(video, value) {
         video.pause()
         console.log("!pause")
     }
+}
+
+function play(video, value) {
+    video.play();
+    console.log("!play")
+}
+
+function pause(video, value) {
+    video.pause();
+    console.log("!play")
 }
 
 //skip to a time
