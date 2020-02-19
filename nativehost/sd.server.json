@@ -9,7 +9,6 @@
     "path": "sd-server.bat",
     "type": "stdio",
     "allowed_origins": [
-      //"chrome-extension://chkgfjgbfekhcgdpjodgmjbdnidadmeg/"
-      "chrome-extension://jeojdnmepccapignpagonaifommhfbkk/"
+      "chrome-extension://hkkmkkadhkpbgnecfmebieppmeenefgg/"
     ]
   }

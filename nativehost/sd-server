@@ -1,18 +1,32 @@
 #!/usr/bin/env python
 
+import collections
 import socket
 import struct
 import sys
 import json
+import time
 
-#Multicast address and port have to match with servicediscovery_client.py on other units
 MCAST_ADDR = "224.1.1.1"
 MCAST_PORT = 5008
+MULTICAST_TTL = 8
+
+PAUSE = 0
+PLAY = 1
+JUMPTO = 2
+GOTOURL = 3
 
 if sys.platform == "win32":
     import os, msvcrt
     msvcrt.setmode(sys.stdin.fileno(), os.O_BINARY)
     msvcrt.setmode(sys.stdout.fileno(), os.O_BINARY)
+
+def get_dev_ipaddr():
+    testsock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    testsock.connect(("8.8.8.8", 80))
+    ipaddr = testsock.getsockname()[0]
+    testsock.close()
+    return ipaddr
 
 def listen_socket():
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
@@ -23,6 +37,7 @@ def listen_socket():
     return sock
 
 def send_message(message):
+    #Modified from https://github.com/mdn/webextensions-examples/tree/master/native-messaging
     encodedMessage = json.dumps(message).encode('utf-8')
     # Write message size.
     sys.stdout.buffer.write(struct.pack('@I', len(encodedMessage)))
@@ -30,9 +45,131 @@ def send_message(message):
     sys.stdout.buffer.write(encodedMessage)
     sys.stdout.buffer.flush()
 
+
+ownip = get_dev_ipaddr()
 sock = listen_socket()
+sock.setblocking(0)
+
+#Create objects for data
+nodes = {}
+session = False
+nodecommands = collections.defaultdict(list)
 
 while True:
-    data, client = sock.recvfrom(10240)
-    data = data.decode("utf-8")
-    send_message(data)
+    try:
+        data, client = sock.recvfrom(10240)
+        data = data.decode("utf-8")
+        #print(data)
+        #sock.sendto("Viesti saatu joten vastataan HÖHÖ".encode("utf-8"), (MCAST_ADDR, MCAST_PORT))
+
+    except BlockingIOError:
+        swarmsize = len(nodes) #how many nodes in group
+        #No message in buffer
+        #print("No message")
+        #TODO: Add application logic here
+
+        #Check status of nodecommands
+        #if this node has to do something, send message to extension
+        for cmd in nodecommands:
+            if (len(cmd) - 1 > swarmsize / 2):
+                if (cmd.split(";")[0] == ownip):
+                    send_message(cmd.split(";", 1)[1])       
+                nodecommands.pop(cmd)
+        #Check status of nodes
+        #if logic dictates a node needs to do something, send message using socket to all nodes
+
+        #Check the video URL
+        videos = []
+        vid_dict = {}
+        for key in nodes.keys():
+            video = nodes[key]["video_url"]
+            videos.append((video, key))
+           
+            if video not in vid_dict:
+                vid_dict[video] = 1
+            else: 
+                vid_dict[video] += 1
+        if len(vid_dict) > 1:
+            max_amount = -9999
+            for key in vid_dict.keys():
+                amount = vid_dict[key]
+                max_amount = max(amount, max_amount)
+                if max_amount == vid_dict[key]:
+                    real_vid = key
+            for key in nodes.keys():
+                if nodes[key]['video'] != real_vid:
+                    sock.sendto((sessionid + ";" + key + ";" + str(JUMPTO) + ";" + real_vid).encode("utf-8"), (MCAST_ADDR, MCAST_PORT))
+
+        #Check the video timestamps
+        timestamps = []
+        for key in nodes.keys():
+            timestamps.append(nodes[key]['timestamp'])
+
+        #Only do something if the difference between different timestamps is over 3 seconds
+        
+        if max(timestamps) - min(timestamps) > 3:
+
+            #Average of the timestamps
+            avr_timestamp = sum(timestamps) / len(timestamps)
+            distances = []
+            #The node with the minimum distance to the average timestamp is "in the right timespot" 
+            for key in nodes.keys():
+                distance_timestamp = nodes[key]['timestamp'] - avr_timestamp
+                distances.append((distance_timestamp, key))
+                real_node = min(distances, key = lambda t: t[0])
+            #If a node is over 3 seconds away from the "correct timestamp", multicast
+            for key in nodes.keys():
+                if real_node[0] - nodes[key]['timestamp'] > 3:
+                    sock.sendto((sessionid + ";" + key + ";" + str(JUMPTO) + ";" + real_node[0]).encode("utf-8"), (MCAST_ADDR, MCAST_PORT))
+
+                    
+                
+
+
+            
+                
+
+
+            
+        
+
+
+        
+        
+        
+
+        #Application logic finished, check socket buffer again
+        time.sleep(0.1)
+        continue
+        #send_message()
+    else:
+        #Message was in buffer
+        try:
+            sessionid, obj = data.split(";", 1)
+        except ValueError:
+            #Invalid message
+            continue
+        #send_message(client)
+
+        if not session:
+            if client == ownip:
+                session = sessionid
+            else:
+                continue
+        if sessionid != session:
+            continue
+
+        json_obj = json.loads(obj)
+        try:
+            nodecmd = json_obj["command"]
+            #Commands are added to object here
+            if client not in nodecommands[nodecmd]:
+                if len(nodecommands[nodecmd]) == 0:
+                    nodecommands[nodecmd].append(time.time) #first timestamp, if this is too old remove commands
+                nodecommands[nodecmd].append(client) #Check length of this list for agreement between nodes, length is amount of nodes + 1
+            
+        except KeyError:
+            #No commands, json is the latest status of a node
+            nodes[client] = json_obj
+        continue
+        
