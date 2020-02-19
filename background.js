@@ -1,5 +1,10 @@
+//all this stuff is now irrelevant, the popup overrides the button function
+
+
+
 //making this work with chrome first
 
+/*
 //some fancy testing
 let message = "status"
 let i = 0
@@ -39,5 +44,5 @@ chrome.browserAction.onClicked.addListener(function(tab) {
   //(and status)
   //todo: add more buttons maybe...
   //should be done with html and css ?
-
+*/
 
