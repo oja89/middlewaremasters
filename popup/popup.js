@@ -23,6 +23,12 @@ function callPause() {
   sendMessage(message)
 }
 
+function callStatus() {
+  let message = "status"
+  sendMessage(message)
+}
+
 //button listeners, seems to need the 'click' name.
 document.getElementById('play').addEventListener('click', callPlay);
 document.getElementById('pause').addEventListener('click', callPause);
+document.getElementById('status').addEventListener('click', callStatus);

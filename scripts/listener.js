@@ -1,7 +1,7 @@
-chrome.runtime.onMessage.addListener(call);
+chrome.runtime.onMessage.addListener(command);
 
   //this listens to the messages, and calls functions
-function call(message, sender, sendresponse) {
+function command(message, sender, sendresponse) {
     
     //well this seems to change.. 
     console.log(sender.id) 
