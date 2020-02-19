@@ -54,6 +54,7 @@ sock.setblocking(0)
 nodes = {}
 session = False
 nodecommands = collections.defaultdict(list)
+sessions = []
 
 while True:
     try:
@@ -88,6 +89,8 @@ while True:
             #Invalid message
             continue
         #send_message(client)
+        if sessionid not in sessions:
+            sessions.append(sessionid)
 
         if not session:
             if client == ownip:
