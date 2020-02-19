@@ -9,6 +9,7 @@ function rollStatus() {
   })
 }
 
+//intervaltime in ms
 const createClock = setInterval(rollStatus, 1000);
 
 //all this stuff is now irrelevant, the popup overrides the button function

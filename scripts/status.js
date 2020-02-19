@@ -1,4 +1,3 @@
-
 //listener for the messages
 chrome.runtime.onMessage.addListener(statusCall);
 
@@ -13,7 +12,6 @@ function statusCall(message, sender, sendresponse) {
                 //show the object in log
                 currentStatus = getStatus(video)
                 console.log(currentStatus)
-                
                 
                 //maybe like this?
                 return currentStatus

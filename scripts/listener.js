@@ -45,6 +45,8 @@ function command(message, sender, sendresponse) {
    // }
 }
 
+//actual functions that the messages are calling for
+
 //this toggling is not really useful in the actual extension
 //works for testing though
 function toggle(video, value) {
@@ -65,7 +67,7 @@ function play(video, value) {
 
 function pause(video, value) {
     video.pause();
-    console.log("!play")
+    console.log("!pause")
 }
 
 //skip to a time
@@ -75,6 +77,7 @@ function skip(video, value) {
 }
 
 //change playbackspeed to something
+//also not important to implement at this point
 function speed(video, value) {
     video.playbackRate = value
     console.log("!speed to: " + value)
