@@ -1,10 +1,21 @@
+//try to implement a timer for status calls here
+
+function rollStatus() {
+  let message = "status"
+  //send it
+  chrome.tabs.query({active: true,currentWindow:true},function(tabs){
+    chrome.tabs.sendMessage(tabs[0].id,message);
+    console.log("sent: "+ message)
+  })
+}
+
+const createClock = setInterval(rollStatus, 1000);
+
 //all this stuff is now irrelevant, the popup overrides the button function
 
-
-
+/*
 //making this work with chrome first
 
-/*
 //some fancy testing
 let message = "status"
 let i = 0
