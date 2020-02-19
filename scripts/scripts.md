@@ -13,6 +13,7 @@ Currently askes for the status with "messages" once per sec.
 
 Communicates with the popup.html
 Send "messages" to content scripts
+It is conveniently located in the popup-folder
 
 # Content scripts:
 

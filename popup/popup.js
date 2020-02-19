@@ -2,8 +2,7 @@
 var currentid = "fjlfj"
 
 //The button configurations and functions start here
-//actual sending to the content script listeners here
-
+//actual sending to the content script listeners here:
 function sendMessage(message) {
   chrome.tabs.query({active: true,currentWindow:true},function(tabs){
     chrome.tabs.sendMessage(tabs[0].id,message);
@@ -11,7 +10,7 @@ function sendMessage(message) {
   })
 }
 
-//message selection according to the button
+//message selection according to the button:
 function callPlay() {
   let message = "play"
   sendMessage(message)
@@ -26,6 +25,11 @@ function callStatus() {
   let message = "status"
   sendMessage(message)
 }
+
+//additional messages that can be used
+//message = "skip_4.2455"
+//message = "speed_1.5"
+//message = "toggle"
 
 //button listeners, seems to need the 'click' name.
 document.getElementById('play').addEventListener('click', callPlay);
