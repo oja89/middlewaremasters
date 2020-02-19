@@ -1,4 +1,4 @@
-function hello() {
+function status() {
     
       //console.log("hello")
       let message = "status"
@@ -8,4 +8,4 @@ function hello() {
       })
 }
   
-  document.getElementById('play').addEventListener('click', hello);
+  document.getElementById('play').addEventListener('click', status);
