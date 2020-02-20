@@ -117,11 +117,12 @@ while True:
             for key in nodes.keys():
                 distance_timestamp = nodes[key]['timestamp'] - avr_timestamp
                 distances.append((distance_timestamp, key))
-                real_node = min(distances, key = lambda t: t[0])
+            real_node = min(distances, key = lambda t: t[0])
+            real_timestamp = (nodes[real_node[1]]['timestamp'], real_node[1])
             #If a node is over 3 seconds away from the "correct timestamp", multicast
             for key in nodes.keys():
-                if real_node[0] - nodes[key]['timestamp'] > 3:
-                    sock.sendto((sessionid + ";" + key + ";" + str(JUMPTO) + ";" + real_node[0]).encode("utf-8"), (MCAST_ADDR, MCAST_PORT))
+                if abs(real_timestamp[0] - nodes[key]['timestamp']) > 3:
+                    sock.sendto((sessionid + ";" + key + ";" + str(JUMPTO) + ";" + real_timestamp[0]).encode("utf-8"), (MCAST_ADDR, MCAST_PORT))
 
 
         #Check if nodes are paused/playing
