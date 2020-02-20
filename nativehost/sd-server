@@ -123,8 +123,29 @@ while True:
                 if real_node[0] - nodes[key]['timestamp'] > 3:
                     sock.sendto((sessionid + ";" + key + ";" + str(JUMPTO) + ";" + real_node[0]).encode("utf-8"), (MCAST_ADDR, MCAST_PORT))
 
-                    
-                
+
+        #Check if nodes are paused/playing
+        videostates = {0: 0, 1: 0}
+        for key in nodes.keys():
+            if nodes[key]["state"] == 0:
+                videostates[0] += 1
+            else:
+                videostates[1] += 1
+
+        if videostates[0] > videostates[1]:
+            #Session agreement is PAUSE
+            for key in nodes.keys():
+                if nodes[key]["state"] == 1:
+                    msg = {"command": key + ";" + str(PAUSE)}
+                    jstring = json.dumps(msg)
+                    sock.sendto((sessionid + ";" + jstring).encode("utf-8"), (MCAST_ADDR, MCAST_PORT))
+        elif videostates[1] > videostates[0]:
+            #Session agreement is PLAY
+            for key in nodes.keys():
+                if nodes[key]["state"] == 0:
+                    msg = {"command": key + ";" + str(PLAY)}
+                    jstring = json.dumps(msg)
+                    sock.sendto((sessionid + ";" + jstring).encode("utf-8"), (MCAST_ADDR, MCAST_PORT))
 
 
             
