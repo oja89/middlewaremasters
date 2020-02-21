@@ -2,7 +2,7 @@
 chrome.runtime.onMessage.addListener(statusCall);
 
 //this function should give the statuses in a json object format
-function statusCall(message, sender, sendresponse) {
+function statusCall(message, sender, sendResponse) {
     console.log(sender.id) 
     //console.log("msg is: " + message)
     if (message == "status") {
@@ -13,8 +13,8 @@ function statusCall(message, sender, sendresponse) {
                 currentStatus = getStatus(video)
                 console.log(currentStatus)
                 
-                //maybe like this?
-                return currentStatus
+                //this seems to work
+                sendResponse(currentStatus)
     }
     //else there is nothing to do in this module
     else {console.log("msg unknown: " + message)}
