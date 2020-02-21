@@ -1,37 +1,43 @@
 //something info which should be read in the popup-fields maybe?
-var currentid = "fjlfj"
+//var currentid = "fjlfj"
 
 //The button configurations and functions start here
 //actual sending to the content script listeners here:
 function sendMessage(message) {
   chrome.tabs.query({active: true,currentWindow:true},function(tabs){
-    chrome.tabs.sendMessage(tabs[0].id,message);
+    chrome.tabs.sendMessage(tabs[0].id, message, function(response) {
+      console.log(response) //this is the response, what is current state
+      //but where the hell do these logs go?
+    });
     console.log("sent: "+ message)
   })
 }
 
 //message selection according to the button:
 function callPlay() {
-  let message = "play"
+  let message = {playCall:true}
   sendMessage(message)
 }
 
 function callPause() {
-  let message = "pause"
+  let message = {pauseCall:true}
   sendMessage(message)
 }
 
 function callStatus() {
-  let message = "status"
+  let message = {statusCall:true}
   sendMessage(message)
 }
 
-//additional messages that can be used
-//message = "skip_4.2455"
-//message = "speed_1.5"
-//message = "toggle"
+function callSkip(time) {
+  //override value atleast for now
+  time = 5.430
+  let message = {skipCall:true, skipTime:time}
+  sendMessage(message)
+}
 
 //button listeners, seems to need the 'click' name.
 document.getElementById('play').addEventListener('click', callPlay);
 document.getElementById('pause').addEventListener('click', callPause);
 document.getElementById('status').addEventListener('click', callStatus);
+document.getElementById('skip').addEventListener('click', callSkip);
