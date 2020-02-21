@@ -72,7 +72,11 @@ while True:
         #Check status of nodecommands
         #if this node has to do something, send message to extension
         for cmd in nodecommands:
-            if (len(cmd) - 1 > swarmsize / 2):
+            #if the command is over 30 seconds old, remove it
+            if (time.time() - nodecommands[cmd][0] > 30):
+                nodecommands.pop(cmd)
+            #if over half of the nodes agree
+            if (len(nodecommands[cmd]) - 1 > swarmsize / 2):
                 if (cmd.split(";")[0] == ownip):
                     send_message(cmd.split(";", 1)[1])       
                 nodecommands.pop(cmd)
@@ -175,7 +179,9 @@ while True:
         #send_message(client)
         if sessionid not in sessions:
             sessions.append(sessionid)
-
+            msg = {}
+            msg['sessions'] = sessions
+            send_message('sessions;' + json.dumps(msg))
         if not session:
             if client == ownip:
                 session = sessionid
@@ -190,7 +196,7 @@ while True:
             #Commands are added to object here
             if client not in nodecommands[nodecmd]:
                 if len(nodecommands[nodecmd]) == 0:
-                    nodecommands[nodecmd].append(time.time) #first timestamp, if this is too old remove commands
+                    nodecommands[nodecmd].append(time.time()) #first timestamp, if this is too old remove commands
                 nodecommands[nodecmd].append(client) #Check length of this list for agreement between nodes, length is amount of nodes + 1
             
         except KeyError:
