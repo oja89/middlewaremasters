@@ -7,11 +7,7 @@
 
 
   "description": "Trying to control YT with extension.",
-  "permissions": [
-    "activeTab",
-    "tabs", "<all_urls>",
-    "webNavigation"
-  ],
+  "permissions": [],
 
   "icons": {
     "48": "icons/red_48.png"
@@ -24,7 +20,7 @@
   "content_scripts": [
     {
       "matches": ["https://*.youtube.com/*", "https://*.vimeo.com/*"],
-      "js": ["scripts/listener.js", "scripts/status.js"]
+      "js": ["scripts/listener.js"]
     }
   ],
  
