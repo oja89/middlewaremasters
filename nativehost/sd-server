@@ -65,6 +65,9 @@ while True:
 
     except BlockingIOError:
         swarmsize = len(nodes) #how many nodes in group
+        if swarmsize == 0:
+            #nothing happening
+            continue
         #No message in buffer
         #print("No message")
         #TODO: Add application logic here
@@ -99,7 +102,7 @@ while True:
                     real_vid = key
             for key in nodes.keys():
                 if nodes[key]['video'] != real_vid:
-                    sock.sendto((sessionid + ";" + key + ";" + str(JUMPTO) + ";" + real_vid).encode("utf-8"), (MCAST_ADDR, MCAST_PORT))
+                    sock.sendto((sessionid + ";" + key + ";" + str(GOTOURL) + ";" + real_vid).encode("utf-8"), (MCAST_ADDR, MCAST_PORT))
 
         #Check the video timestamps
         timestamps = []
@@ -183,6 +186,13 @@ while True:
                 continue
         if sessionid != session:
             continue
+        
+        if obj == 0:
+            #Force pause command
+            send_message(str(PAUSE))
+        elif obj == 1:
+            #Force play command
+            send_message(str(PLAY))
 
         json_obj = json.loads(obj)
         try:
