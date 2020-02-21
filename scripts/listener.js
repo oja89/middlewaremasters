@@ -21,9 +21,10 @@ function command(message, sender, sendResponse) {
              //this should be forwarded to background, and only then it should start status asking  
             let bgMessage = {newTab:true, newId:message.id}
             chrome.runtime.sendMessage(bgMessage); 
+            //this part seems to work for status asking at least
+            //so that background gets status even while not focused
         }
 
-        //let video = document.getElementsByTagName("video")[0];
         if (message.playCall) {
             video.play();
             console.log("!play,"+ "paused: ", video.paused)            
@@ -52,11 +53,7 @@ function command(message, sender, sendResponse) {
 function statusCall(message, sender, sendresponse) {
 
     if ((sender.id == extensionID) || senderOverride) {
-        if (message.statusCall) {
-            //get the video. from the elements
-            //move this to the start, so that it is loaded when the page is loaded
-            //let video = document.getElementsByTagName("video")[0];
-              
+        if (message.statusCall) {             
             //run the status function
                 //show the object in log
                 currentStatus = getStatus(video)

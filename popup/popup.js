@@ -2,7 +2,7 @@
 //var currentid = "fjlfj"
 
 //we are always sending to the current tab, that should be changed somehow
-let myTab = "undefined"
+let myTab
 
 
 //The button configurations and functions start here
@@ -40,6 +40,7 @@ function callSkip(time) {
 }
 
 //locking the tab-variable
+//send it to listener, which can send it to background
 function lockTab() {
   chrome.tabs.query({active: true,currentWindow:true},function(tabs){
     myTab = tabs[0].id

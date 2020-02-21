@@ -7,7 +7,7 @@
 
 
   "description": "Trying to control YT with extension.",
-  "permissions": [],
+  "permissions": ["tabs"],
 
   "icons": {
     "48": "icons/red_48.png"

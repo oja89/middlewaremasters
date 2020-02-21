@@ -7,7 +7,7 @@ let myTab
 //make a listener here for the popups lock-this-tab function
 chrome.runtime.onMessage.addListener(lockTheTab)
 
-//no success with this
+//now getting this info popup -> listener -> background and seems to work for status
 function lockTheTab(bgMessage, sender, sendResponse) {
   if (bgMessage.newTab) {
     //log sender 
@@ -18,13 +18,16 @@ function lockTheTab(bgMessage, sender, sendResponse) {
 }
 
 function rollStatus() {
-  let message = {statusCall:true}
-  //send it without quering
-  console.log("mytab:"+ myTab)
-    chrome.tabs.sendMessage(myTab, message, function(response) {
-      
-      console.log(response) //this is the status-object
-    });
+  //dont ask if no tab is locked
+  //how to disconnect?
+  if (myTab) {
+    let message = {statusCall:true}
+    //send it without quering
+    console.log("mytab:"+ myTab)
+      chrome.tabs.sendMessage(myTab, message, function(response) {
+        console.log(response) //this is the status-object
+      });
+    }
 }
 
 //intervaltime in ms
