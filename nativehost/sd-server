@@ -54,6 +54,7 @@ sock.setblocking(0)
 nodes = {}
 session = False
 nodecommands = collections.defaultdict(list)
+sessions = []
 
 while True:
     try:
@@ -64,14 +65,24 @@ while True:
 
     except BlockingIOError:
         swarmsize = len(nodes) #how many nodes in group
+        if swarmsize == 0:
+            #nothing happening
+            continue
         #No message in buffer
         #print("No message")
         #TODO: Add application logic here
 
         #Check status of nodecommands
         #if this node has to do something, send message to extension
-        for cmd in nodecommands:
-            if (len(cmd) - 1 > swarmsize / 2):
+
+        keylist = nodecommands.keys()
+        for cmd in keylist:
+            #if the command is over 30 seconds old, remove it
+            if (time.time() - nodecommands[cmd][0] > 30):
+                nodecommands.pop(cmd)
+                continue
+            #if over half of the nodes agree
+            if (len(nodecommands[cmd]) - 1 > swarmsize / 2):
                 if (cmd.split(";")[0] == ownip):
                     send_message(cmd.split(";", 1)[1])       
                 nodecommands.pop(cmd)
@@ -98,7 +109,9 @@ while True:
                     real_vid = key
             for key in nodes.keys():
                 if nodes[key]['video'] != real_vid:
-                    sock.sendto((sessionid + ";" + key + ";" + str(JUMPTO) + ";" + real_vid).encode("utf-8"), (MCAST_ADDR, MCAST_PORT))
+                    msg = {"command": key + ";" + str(GOTOURL) + ";" + real_vid}
+                    jstring = json.dumps(msg)
+                    sock.sendto((sessionid + ";" + jstring).encode("utf-8"), (MCAST_ADDR, MCAST_PORT))
 
         #Check the video timestamps
         timestamps = []
@@ -116,14 +129,38 @@ while True:
             for key in nodes.keys():
                 distance_timestamp = nodes[key]['timestamp'] - avr_timestamp
                 distances.append((distance_timestamp, key))
-                real_node = min(distances, key = lambda t: t[0])
+            real_node = min(distances, key = lambda t: t[0])
+            real_timestamp = (nodes[real_node[1]]['timestamp'], real_node[1])
             #If a node is over 3 seconds away from the "correct timestamp", multicast
             for key in nodes.keys():
-                if real_node[0] - nodes[key]['timestamp'] > 3:
-                    sock.sendto((sessionid + ";" + key + ";" + str(JUMPTO) + ";" + real_node[0]).encode("utf-8"), (MCAST_ADDR, MCAST_PORT))
+                if abs(real_timestamp[0] - nodes[key]['timestamp']) > 3:
+                    msg = {'command': key + ";" + str(JUMPTO) + ";" + real_timestamp[0]}
+                    jstring = json.dumps(msg)
+                    sock.sendto((sessionid + ";" + jstring).encode("utf-8"), (MCAST_ADDR, MCAST_PORT))
 
-                    
-                
+
+        #Check if nodes are paused/playing
+        videostates = {0: 0, 1: 0}
+        for key in nodes.keys():
+            if nodes[key]["state"] == 0:
+                videostates[0] += 1
+            else:
+                videostates[1] += 1
+
+        if videostates[0] > videostates[1]:
+            #Session agreement is PAUSE
+            for key in nodes.keys():
+                if nodes[key]["state"] == 1:
+                    msg = {"command": key + ";" + str(PAUSE)}
+                    jstring = json.dumps(msg)
+                    sock.sendto((sessionid + ";" + jstring).encode("utf-8"), (MCAST_ADDR, MCAST_PORT))
+        elif videostates[1] > videostates[0]:
+            #Session agreement is PLAY
+            for key in nodes.keys():
+                if nodes[key]["state"] == 0:
+                    msg = {"command": key + ";" + str(PLAY)}
+                    jstring = json.dumps(msg)
+                    sock.sendto((sessionid + ";" + jstring).encode("utf-8"), (MCAST_ADDR, MCAST_PORT))
 
 
             
@@ -150,7 +187,11 @@ while True:
             #Invalid message
             continue
         #send_message(client)
-
+        if sessionid not in sessions:
+            sessions.append(sessionid)
+            msg = {}
+            msg['sessions'] = sessions
+            send_message('sessions;' + json.dumps(msg))
         if not session:
             if client == ownip:
                 session = sessionid
@@ -158,6 +199,13 @@ while True:
                 continue
         if sessionid != session:
             continue
+        
+        if obj == 0:
+            #Force pause command
+            send_message(str(PAUSE))
+        elif obj == 1:
+            #Force play command
+            send_message(str(PLAY))
 
         json_obj = json.loads(obj)
         try:
@@ -165,7 +213,7 @@ while True:
             #Commands are added to object here
             if client not in nodecommands[nodecmd]:
                 if len(nodecommands[nodecmd]) == 0:
-                    nodecommands[nodecmd].append(time.time) #first timestamp, if this is too old remove commands
+                    nodecommands[nodecmd].append(time.time()) #first timestamp, if this is too old remove commands
                 nodecommands[nodecmd].append(client) #Check length of this list for agreement between nodes, length is amount of nodes + 1
             
         except KeyError:

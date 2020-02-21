@@ -4,6 +4,9 @@ print("alko")
 
 import socket
 import time
+import sys
+import struct
+import json
 
 MCAST_ADDR = "224.1.1.1"
 MCAST_PORT = 5008
@@ -12,13 +15,23 @@ MULTICAST_TTL = 8
 
 TOKEN = "testi;testi2"
 
-def service_discovery():
-    
+def getMessage():
+    #From https://github.com/mdn/webextensions-examples/tree/master/native-messaging
+    rawLength = sys.stdin.buffer.read(4)
+    if len(rawLength) == 0:
+        sys.exit(0)
+    messageLength = struct.unpack('@I', rawLength)[0]
+    message = sys.stdin.buffer.read(messageLength).decode('utf-8')
+    return json.loads(message)
+
+def createSocket():
+    #Creates the socket for multicast
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
     sock.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_TTL, MULTICAST_TTL)
-    while True:
-        print("Multicasting...")
-        sock.sendto(TOKEN.encode("utf-8"), (MCAST_ADDR, MCAST_PORT))
-        time.sleep(1)
+    return sock
 
-service_discovery()
+sock = createSocket()
+
+while True:
+    extmessage = getMessage()
+    sock.sendto(extmessage.encode("utf-8"), (MCAST_ADDR, MCAST_PORT))
