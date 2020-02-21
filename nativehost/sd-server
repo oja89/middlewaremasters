@@ -74,10 +74,13 @@ while True:
 
         #Check status of nodecommands
         #if this node has to do something, send message to extension
-        for cmd in nodecommands:
+
+        keylist = nodecommands.keys()
+        for cmd in keylist:
             #if the command is over 30 seconds old, remove it
             if (time.time() - nodecommands[cmd][0] > 30):
                 nodecommands.pop(cmd)
+                continue
             #if over half of the nodes agree
             if (len(nodecommands[cmd]) - 1 > swarmsize / 2):
                 if (cmd.split(";")[0] == ownip):
@@ -106,7 +109,9 @@ while True:
                     real_vid = key
             for key in nodes.keys():
                 if nodes[key]['video'] != real_vid:
-                    sock.sendto((sessionid + ";" + key + ";" + str(GOTOURL) + ";" + real_vid).encode("utf-8"), (MCAST_ADDR, MCAST_PORT))
+                    msg = {"command": key + ";" + str(GOTOURL) + ";" + real_vid}
+                    jstring = json.dumps(msg)
+                    sock.sendto((sessionid + ";" + jstring).encode("utf-8"), (MCAST_ADDR, MCAST_PORT))
 
         #Check the video timestamps
         timestamps = []
@@ -129,7 +134,9 @@ while True:
             #If a node is over 3 seconds away from the "correct timestamp", multicast
             for key in nodes.keys():
                 if abs(real_timestamp[0] - nodes[key]['timestamp']) > 3:
-                    sock.sendto((sessionid + ";" + key + ";" + str(JUMPTO) + ";" + real_timestamp[0]).encode("utf-8"), (MCAST_ADDR, MCAST_PORT))
+                    msg = {'command': key + ";" + str(JUMPTO) + ";" + real_timestamp[0]}
+                    jstring = json.dumps(msg)
+                    sock.sendto((sessionid + ";" + jstring).encode("utf-8"), (MCAST_ADDR, MCAST_PORT))
 
 
         #Check if nodes are paused/playing
