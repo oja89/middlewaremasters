@@ -3,6 +3,7 @@
 //choosing the right tab should be done somewhere?
 //now sending always to the active tab
 let myTab
+var port
 
 //make a listener here for the popups lock-this-tab function
 chrome.runtime.onMessage.addListener(lockTheTab)
@@ -17,7 +18,7 @@ function lockTheTab(bgMessage, sender, sendResponse) {
   }
 }
 
-function rollStatus() {
+function rollStatus(port) {
   //dont ask if no tab is locked
   //how to disconnect?
   if (myTab) {
@@ -25,31 +26,33 @@ function rollStatus() {
     //send it without quering
     console.log("mytab:"+ myTab)
       chrome.tabs.sendMessage(myTab, message, function(response) {
-        console.log(response) //this is the status-object
+        console.log(response); //this is the status-object
+        port.postMessage(JSON.stringify(response));
       });
     }
 }
 
 //intervaltime in ms
-const createClock = setInterval(rollStatus, 1000);
 
 //all previous stuff with the button testing is now irrelevant, the popup overrides the button function
 
 //sd-side stuff
 
 var backpage = chrome.extension.getBackgroundPage();
-backpage.console.log("Alotettu");
+
 
 function msgGot(message) {
   backpage.console.log(message);
   return true;
 }
 
-function connectToServer() {
-  var nativehost = "sd.server";
-  port = chrome.runtime.connectNative(nativehost);
-  port.onMessage.addListener(msgGot);
-}
 
-connectToServer()
+var nativehost = "sd.client";
+port = chrome.runtime.connectNative(nativehost);
+port.onMessage.addListener(msgGot);
 
+
+
+
+
+const createClock = setInterval(rollStatus, 1000, port);

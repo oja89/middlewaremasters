@@ -13,16 +13,30 @@ MCAST_PORT = 5008
 
 MULTICAST_TTL = 8
 
+if sys.platform == "win32":
+    import os, msvcrt
+    msvcrt.setmode(sys.stdin.fileno(), os.O_BINARY)
+    msvcrt.setmode(sys.stdout.fileno(), os.O_BINARY)
+
 TOKEN = "testi;testi2"
 
 def getMessage():
     #From https://github.com/mdn/webextensions-examples/tree/master/native-messaging
     rawLength = sys.stdin.buffer.read(4)
-    if len(rawLength) == 0:
-        sys.exit(0)
+    #if len(rawLength) == 0:
+        #sys.exit(0)
     messageLength = struct.unpack('@I', rawLength)[0]
     message = sys.stdin.buffer.read(messageLength).decode('utf-8')
     return json.loads(message)
+
+def send_message(message):
+    #Modified from https://github.com/mdn/webextensions-examples/tree/master/native-messaging
+    encodedMessage = json.dumps(message).encode('utf-8')
+    # Write message size.
+    sys.stdout.buffer.write(struct.pack('@I', len(encodedMessage)))
+    # Write the message itself.
+    sys.stdout.buffer.write(encodedMessage)
+    sys.stdout.buffer.flush()
 
 def createSocket():
     #Creates the socket for multicast
@@ -33,5 +47,6 @@ def createSocket():
 sock = createSocket()
 
 while True:
+    send_message("loop in client")
     extmessage = getMessage()
     sock.sendto(extmessage.encode("utf-8"), (MCAST_ADDR, MCAST_PORT))
