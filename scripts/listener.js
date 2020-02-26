@@ -6,12 +6,8 @@ let senderOverride = false
 let extensionID = "hkkmkkadhkpbgnecfmebieppmeenefgg"
 
 //the video on _this_ page is:
+//should this be updated by some functions?
 let video = document.getElementsByTagName("video")[0];
-
-//this listens to the messages, and returns new statuses (which do nothing)
-chrome.runtime.onMessage.addListener(command);
-//listener for the messages
-chrome.runtime.onMessage.addListener(statusCall);
 
 function command(message, sender, sendResponse) {
     if ((sender.id == extensionID) || senderOverride) {
@@ -48,10 +44,10 @@ function command(message, sender, sendResponse) {
     }
 }
 
-
 //this function should give the statuses in a json object format
 function statusCall(message, sender, sendresponse) {
-
+    //if sender is not the defined one, do nothing
+    //unless override == true
     if ((sender.id == extensionID) || senderOverride) {
         if (message.statusCall) {             
             //run the status function
@@ -64,12 +60,15 @@ function statusCall(message, sender, sendresponse) {
     }
 }
 
-
+//test rolling a logical number clock
+let timestamp = 0
 //this function fetches the statuses from the video
 function getStatus(video) {
     //create the object
-    var status = {}
-    
+    let status = {}
+    timestamp += 1
+    status.timestamp = timestamp 
+
     //use the same "commands" as the video commands for clarity plz
     status.src = video.src //this is not same if different url
     status.paused = video.paused
@@ -81,3 +80,7 @@ function getStatus(video) {
     return status
 }
 
+//this listens to the messages, and returns new statuses (which do nothing)
+chrome.runtime.onMessage.addListener(command);
+//listener for the messages
+chrome.runtime.onMessage.addListener(statusCall);

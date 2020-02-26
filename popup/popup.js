@@ -4,7 +4,6 @@
 //we are always sending to the current tab, that should be changed somehow
 let myTab
 
-
 //The button configurations and functions start here
 //actual sending to the content script listeners here:
 function sendMessage(message) {
@@ -13,10 +12,11 @@ function sendMessage(message) {
       //but where the hell do these logs go?
     });
     console.log("sent: "+ message, "tab: " + myTab)
-  //})
 }
 
 //message selection according to the button:
+//these should be modified to just send these to the python,
+//not to the own video-player
 function callPlay() {
   let message = {playCall:true}
   sendMessage(message)
@@ -46,11 +46,9 @@ function lockTab() {
     myTab = tabs[0].id
     let message = {tab:true, id:myTab}
     sendMessage(message)
-    console.log(myTab) //this is the status-object
+    console.log("Tab id: " + myTab) //the locked tab id
     });
 }
-
-
 
 //button listeners, seems to need the 'click' name.
 document.getElementById('play').addEventListener('click', callPlay);
