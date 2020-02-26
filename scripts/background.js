@@ -27,7 +27,10 @@ function rollStatus(port) {
     console.log("mytab:"+ myTab)
       chrome.tabs.sendMessage(myTab, message, function(response) {
         console.log(response); //this is the status-object
-        port.postMessage(JSON.stringify(response));
+        if (response !== undefined) {
+          port.postMessage(JSON.stringify(response)); 
+        }
+          
       });
     }
 }
