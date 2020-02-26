@@ -60,6 +60,7 @@ while True:
     try:
         data, client = sock.recvfrom(10240)
         data = data.decode("utf-8")
+        send_message(data)
         #print(data)
         #sock.sendto("Viesti saatu joten vastataan HÖHÖ".encode("utf-8"), (MCAST_ADDR, MCAST_PORT))
 
