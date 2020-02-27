@@ -1,60 +1,62 @@
-//something info which should be read in the popup-fields maybe?
-//var currentid = "fjlfj"
+//these are the functions that the popup-menu uses
 
-//we are always sending to the current tab, that should be changed somehow
+//straight msging to bg doesnt seem to work correctly
+//so these go first to the content script, which forwards some to the bg
+
+//we are always sending to the current tab, that should be stored and updated
 let myTab
 
-
 //The button configurations and functions start here
-//actual sending to the content script listeners here:
+//actual sending function to the content script listeners here:
 function sendMessage(message) {
      chrome.tabs.sendMessage(myTab, message, function(response) {
-      console.log(response) //this is the response, what is current state
-      //but where the hell do these logs go?
+      //TODO: does something need the response?
     });
-    console.log("sent: "+ message, "tab: " + myTab)
-  //})
+    //log to the background log..
+    chrome.extension.getBackgroundPage().console.log("sent message to tab: " + myTab)
 }
 
-//message selection according to the button:
+//These are the new ones from popup which need to be send forward to background
 function callPlay() {
-  let message = {playCall:true}
+  chrome.extension.getBackgroundPage().console.log("playButton")
+  let message = {force:true, playForce:true}
   sendMessage(message)
 }
 
 function callPause() {
-  let message = {pauseCall:true}
-  sendMessage(message)
-}
-
-function callStatus() {
-  let message = {statusCall:true}
-  sendMessage(message)
-}
-
-function callSkip(time) {
-  //override value atleast for now
-  time = 5.430
-  let message = {skipCall:true, skipTime:time}
+  chrome.extension.getBackgroundPage().console.log("pauseButton")
+  let message = {force:true, pauseForce:true}
   sendMessage(message)
 }
 
 //locking the tab-variable
 //send it to listener, which can send it to background
 function lockTab() {
+  chrome.extension.getBackgroundPage().console.log("tabButton")
   chrome.tabs.query({active: true,currentWindow:true},function(tabs){
     myTab = tabs[0].id
     let message = {tab:true, id:myTab}
     sendMessage(message)
-    console.log(myTab) //this is the status-object
+    chrome.extension.getBackgroundPage().console.log("Tab id: " + myTab) //the locked tab id
     });
 }
 
+//this is at the moment a somewhat temporary "this works"-example
+function callUrl() {
+  let url = "https://www.youtube.com/watch?v=Ca_oJg5aThY"
+  //TODO:
+  //url should be changed to be the one that is active on this tab?
+  //or which is input somewhere
+  //and just force it to other clients
+  let message = {newUrl:true, urlStr:url}
+  sendMessage(message)
+  chrome.extension.getBackgroundPage().console.log("changeUrl")
+}
 
 
 //button listeners, seems to need the 'click' name.
 document.getElementById('play').addEventListener('click', callPlay);
 document.getElementById('pause').addEventListener('click', callPause);
-document.getElementById('status').addEventListener('click', callStatus);
-document.getElementById('skip').addEventListener('click', callSkip);
+document.getElementById('url').addEventListener('click', callUrl);
 document.getElementById('lock').addEventListener('click', lockTab);
+

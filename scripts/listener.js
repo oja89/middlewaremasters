@@ -6,24 +6,44 @@ let senderOverride = false
 let extensionID = "hkkmkkadhkpbgnecfmebieppmeenefgg"
 
 //the video on _this_ page is:
+//should this be updated by some functions?
 let video = document.getElementsByTagName("video")[0];
 
-//this listens to the messages, and returns new statuses (which do nothing)
-chrome.runtime.onMessage.addListener(command);
-//listener for the messages
-chrome.runtime.onMessage.addListener(statusCall);
+//this tab should be stored also here
+let thisTab
 
-function command(message, sender, sendResponse) {
+function listener(message, sender, sendResponse) {
     if ((sender.id == extensionID) || senderOverride) {
-        //get the tab, and save it?
+        //if it is a force-message, just send it forward
+        //(popup to background)
+        if (message.force) {
+            chrome.runtime.sendMessage(message); 
+        }
+
+        //status roller
+        if (message.statusCall) {             
+            //run the status function
+                //show the object in log
+                currentStatus = getStatus(video)
+                console.log(currentStatus)
+                //send back
+                sendResponse(currentStatus)
+        }
+        
+        //tab-selector
+        //get the tab, to lock the tab
         if (message.tab) {
             console.log("locked to: "+ message.id)
              //this should be forwarded to background, and only then it should start status asking  
             let bgMessage = {newTab:true, newId:message.id}
             chrome.runtime.sendMessage(bgMessage); 
-            //this part seems to work for status asking at least
-            //so that background gets status even while not focused
+
+            //write this also to "this" listeners variable
+            thisTab = message.id
         }
+
+        //command calls
+        //these should now come from the python script
 
         if (message.playCall) {
             video.play();
@@ -45,31 +65,27 @@ function command(message, sender, sendResponse) {
             //check video status and return it
             sendResponse(video.currentTime) 
         }
-    }
-}
 
-
-//this function should give the statuses in a json object format
-function statusCall(message, sender, sendresponse) {
-
-    if ((sender.id == extensionID) || senderOverride) {
-        if (message.statusCall) {             
-            //run the status function
-                //show the object in log
-                currentStatus = getStatus(video)
-                console.log(currentStatus)
-                //send back
-                sendresponse(currentStatus)
+        if (message.newUrl) {
+            console.log("change url to: ", message.urlStr)
+            //add thisTab to the message (locally saved variable)
+            message.thisTab = thisTab
+            chrome.runtime.sendMessage(message); 
         }
+
     }
 }
 
 
+//test rolling a logical number clock
+let timestamp = 0
 //this function fetches the statuses from the video
 function getStatus(video) {
     //create the object
-    var status = {}
-    
+    let status = {}
+    timestamp += 1
+    status.timestamp = timestamp 
+
     //use the same "commands" as the video commands for clarity plz
     status.src = video.src //this is not same if different url
     if (video.paused == false) {
@@ -86,3 +102,5 @@ function getStatus(video) {
     return status
 }
 
+//this listens to the messages
+chrome.runtime.onMessage.addListener(listener);

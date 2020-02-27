@@ -23,11 +23,10 @@ These are ran when the url matches the given criteria
 ## listener.js:
 
 Listens for the commands from popup.js
-Gives the command to the video element
+Commands are sent as objects.
 
-## status.js
-
-Listens for the command "status"
+Gives the command to the video element.
 Currently answers for the status button by popup.js and the cyclical status asking from background.js
+
 
 
