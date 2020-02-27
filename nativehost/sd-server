@@ -230,6 +230,6 @@ while True:
             
         except KeyError:
             #No commands, json is the latest status of a node
-            nodes[client] = json_obj
+            nodes[client[0]] = json_obj
         continue
         
