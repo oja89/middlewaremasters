@@ -2,16 +2,33 @@
 // this is derived from the key in manifest while the extension is not "published"
 
 //change override to true in case the id is not stable
-let senderOverride = false
+let senderOverride = true //false
 let extensionID = "hkkmkkadhkpbgnecfmebieppmeenefgg"
 
 //the video on _this_ page is:
 //should this be updated by some functions?
 let video = document.getElementsByTagName("video")[0];
 
-function command(message, sender, sendResponse) {
+function listener(message, sender, sendResponse) {
     if ((sender.id == extensionID) || senderOverride) {
-        //get the tab, and save it?
+        //if it is a force-message, just send it forward
+        //(popup to background)
+        if (message.force) {
+            chrome.runtime.sendMessage(message); 
+        }
+
+        //status roller
+        if (message.statusCall) {             
+            //run the status function
+                //show the object in log
+                currentStatus = getStatus(video)
+                console.log(currentStatus)
+                //send back
+                sendResponse(currentStatus)
+        }
+        
+        //tab-selector
+        //get the tab, to lock the tab
         if (message.tab) {
             console.log("locked to: "+ message.id)
              //this should be forwarded to background, and only then it should start status asking  
@@ -20,6 +37,9 @@ function command(message, sender, sendResponse) {
             //this part seems to work for status asking at least
             //so that background gets status even while not focused
         }
+
+        //command calls
+        //these should now come from the python script
 
         if (message.playCall) {
             video.play();
@@ -41,24 +61,11 @@ function command(message, sender, sendResponse) {
             //check video status and return it
             sendResponse(video.currentTime) 
         }
+
+
     }
 }
 
-//this function should give the statuses in a json object format
-function statusCall(message, sender, sendresponse) {
-    //if sender is not the defined one, do nothing
-    //unless override == true
-    if ((sender.id == extensionID) || senderOverride) {
-        if (message.statusCall) {             
-            //run the status function
-                //show the object in log
-                currentStatus = getStatus(video)
-                console.log(currentStatus)
-                //send back
-                sendresponse(currentStatus)
-        }
-    }
-}
 
 //test rolling a logical number clock
 let timestamp = 0
@@ -80,7 +87,5 @@ function getStatus(video) {
     return status
 }
 
-//this listens to the messages, and returns new statuses (which do nothing)
-chrome.runtime.onMessage.addListener(command);
-//listener for the messages
-chrome.runtime.onMessage.addListener(statusCall);
+//this listens to the messages
+chrome.runtime.onMessage.addListener(listener);
