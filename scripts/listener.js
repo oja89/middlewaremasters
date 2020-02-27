@@ -72,7 +72,12 @@ function getStatus(video) {
     
     //use the same "commands" as the video commands for clarity plz
     status.src = video.src //this is not same if different url
-    status.paused = video.paused
+    if (video.paused == false) {
+        status.paused = 0;
+    }
+    else if (video.paused == true) {
+        status.paused = 1;
+    }
     status.currentTime = video.currentTime
     status.playbackRate = video.playbackRate
     status.readyState = video.readyState

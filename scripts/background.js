@@ -28,7 +28,7 @@ function rollStatus(port) {
       chrome.tabs.sendMessage(myTab, message, function(response) {
         console.log(response); //this is the status-object
         if (response !== undefined) {
-          port.postMessage(JSON.stringify(response)); 
+          port.postMessage("testsession1;" + JSON.stringify(response)); 
         }
           
       });
