@@ -132,7 +132,7 @@ while True:
             distances = []
             #The node with the minimum distance to the average timestamp is "in the right timespot" 
             for key in nodes.keys():
-                distance_timestamp = nodes[key]['currentTime'] - avr_timestamp
+                distance_timestamp = abs(nodes[key]['currentTime'] - avr_timestamp)
                 distances.append((distance_timestamp, key))
             real_node = min(distances, key = lambda t: t[0])
             real_timestamp = (nodes[real_node[1]]['currentTime'], real_node[1])
