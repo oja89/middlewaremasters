@@ -230,6 +230,11 @@ while True:
             
         except KeyError:
             #No commands, json is the latest status of a node
+            json_obj["receiveTime"] = time.time()
+            keylist = list(nodes.keys())
+            for key in keylist:
+                if time.time() - nodes[key]["receiveTime"] > 10: #Node has been lost
+                    nodes.pop(key)
             nodes[client[0]] = json_obj
         continue
         
