@@ -80,8 +80,8 @@ while True:
 
         keylist = list(nodecommands.keys())
         for cmd in keylist:
-            #if the command is over 30 seconds old, remove it
-            if (time.time() - nodecommands[cmd][0] > 30):
+            #if the command is over 30 seconds old, remove it or if nodes have disconnected/been added, remove it
+            if (time.time() - nodecommands[cmd][0][0] > 30 or swarmsize != nodecommands[cmd][0][1]):
                 nodecommands.pop(cmd)
                 continue
             #if over half of the nodes agree
@@ -225,7 +225,7 @@ while True:
             #Commands are added to object here
             if client not in nodecommands[nodecmd]:
                 if len(nodecommands[nodecmd]) == 0:
-                    nodecommands[nodecmd].append(time.time()) #first timestamp, if this is too old remove commands
+                    nodecommands[nodecmd].append((time.time(), len(nodes))) #first timestamp, if this is too old remove commands
                 nodecommands[nodecmd].append(client) #Check length of this list for agreement between nodes, length is amount of nodes + 1
             
         except KeyError:
