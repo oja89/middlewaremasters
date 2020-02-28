@@ -78,7 +78,7 @@ while True:
         #Check status of nodecommands
         #if this node has to do something, send message to extension
 
-        keylist = nodecommands.keys()
+        keylist = list(nodecommands.keys())
         for cmd in keylist:
             #if the command is over 30 seconds old, remove it
             if (time.time() - nodecommands[cmd][0] > 30):
