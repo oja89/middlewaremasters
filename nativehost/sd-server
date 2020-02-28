@@ -65,7 +65,7 @@ while True:
         #sock.sendto("Viesti saatu joten vastataan HÖHÖ".encode("utf-8"), (MCAST_ADDR, MCAST_PORT))
 
     except BlockingIOError:
-        send_message("No message, analyzing statuses")
+        #send_message("No message, analyzing statuses")
         time.sleep(0.1)
         swarmsize = len(nodes) #how many nodes in group
         if swarmsize == 0:
@@ -91,7 +91,7 @@ while True:
                 nodecommands.pop(cmd)
         #Check status of nodes
         #if logic dictates a node needs to do something, send message using socket to all nodes
-        send_message("Commands checked, start logic")
+        #send_message("Commands checked, start logic")
 
         #Check the video URL
         videos = []
@@ -179,7 +179,7 @@ while True:
         
         
         
-        send_message("Logic finished")
+        #send_message("Logic finished")
         #Application logic finished, check socket buffer again
         #time.sleep(0.1)
         continue
@@ -188,7 +188,7 @@ while True:
         #Message was in buffer
         try:
             sessionid, obj = data.split(";", 1)
-            send_message("Split to " + sessionid + " and " + obj)
+            #send_message("Split to " + sessionid + " and " + obj)
         except ValueError:
             #Invalid message
             continue
@@ -199,7 +199,7 @@ while True:
             msg['sessions'] = sessions
             send_message('sessions;' + json.dumps(msg))
         if not session:
-            send_message("Comparing: " + client[0] + " vs " + ownip)
+            #send_message("Comparing: " + client[0] + " vs " + ownip)
             if client[0] == ownip:
                 send_message("Session chosen = " + sessionid)
                 session = sessionid
@@ -219,7 +219,7 @@ while True:
         except ValueError:
             #Not json
             continue
-        send_message("Obj loaded")
+        #send_message("Obj loaded")
         try:
             nodecmd = json_obj["command"]
             #Commands are added to object here
