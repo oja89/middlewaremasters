@@ -139,7 +139,7 @@ while True:
             #If a node is over 3 seconds away from the "correct timestamp", multicast
             for key in nodes.keys():
                 if abs(real_timestamp[0] - nodes[key]['currentTime']) > 3:
-                    msg = {'command': key + ";" + str(JUMPTO) + ";" + real_timestamp[0]}
+                    msg = {'command': key + ";" + str(JUMPTO) + ";" + str(real_timestamp[0])}
                     jstring = json.dumps(msg)
                     sock.sendto((sessionid + ";" + jstring).encode("utf-8"), (MCAST_ADDR, MCAST_PORT))
 
