@@ -156,14 +156,14 @@ while True:
             #Session agreement is PAUSE
             for key in nodes.keys():
                 if nodes[key]["paused"] == 1:
-                    msg = {"command": key + ";" + str(PAUSE)}
+                    msg = {"command": key + ";" + str(PLAY)}
                     jstring = json.dumps(msg)
                     sock.sendto((sessionid + ";" + jstring).encode("utf-8"), (MCAST_ADDR, MCAST_PORT))
         elif videostates[1] > videostates[0]:
             #Session agreement is PLAY
             for key in nodes.keys():
                 if nodes[key]["paused"] == 0:
-                    msg = {"command": key + ";" + str(PLAY)}
+                    msg = {"command": key + ";" + str(PAUSE)}
                     jstring = json.dumps(msg)
                     sock.sendto((sessionid + ";" + jstring).encode("utf-8"), (MCAST_ADDR, MCAST_PORT))
 
