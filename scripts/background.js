@@ -105,7 +105,7 @@ function serverMsg(sMsg) {
     let message = {skipCall:true, skipTime: value}
     chrome.tabs.sendMessage(myTab, message)
   }
-  if (sMsg == 3) {
+  if (command == 3) {
     //ask the tab to change url
     //let message = {newUrl:true, urlStr: value}
     //chrome.tabs.sendMessage(myTab, message)
