@@ -1,7 +1,7 @@
 //choosing the right tab should be done somewhere?
 //now sending always to the active tab
 let myTab
-let exists = false
+let tabExists = false
 
 //ports for python
 let pyClient = "sd.client";
