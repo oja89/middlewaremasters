@@ -2,6 +2,12 @@
 //now sending always to the active tab
 let myTab
 
+//port for python
+let nativehost = "sd.client";
+let port = chrome.runtime.connectNative(nativehost);
+
+
+
 //change override to true in case the id is not stable
 let senderOverride = false
 let extensionID = "hkkmkkadhkpbgnecfmebieppmeenefgg"
@@ -41,7 +47,7 @@ function contentMsg(message, sender, sendResponse) {
 }
 
 //function to ask the status from listener
-function rollStatus() {
+function rollStatus(port) {
   //dont ask if no tab is locked
   //TODO: how to disconnect?
   if (myTab) {
@@ -59,7 +65,18 @@ function rollStatus() {
 }
 
 //intervaltime in ms
-const createClock = setInterval(rollStatus, 1000);
+
+//dont really know how this port-thing fits here, but lets see
+const createClock = setInterval(rollStatus, 1000, port);
+
+//listener function for python messages
+function msgGot(message) {
+  console.log(message);
+  return true;
+}
+
+//start python listener
+port.onMessage.addListener(msgGot);
 
 //moved to the end
 //make a listener here for the popups lock-this-tab function
