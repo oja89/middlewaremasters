@@ -111,7 +111,10 @@ function serverMsg(sMsg) {
     //chrome.tabs.sendMessage(myTab, message)
     
     //actually we can do it just here
-    chrome.tabs.update(myTab, {url: value})
+    //but the myTab needs to be defined!
+    if (myTab) {
+      chrome.tabs.update(myTab, {url: value})
+    }
   }
   return true;
 }
