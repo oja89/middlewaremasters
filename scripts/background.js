@@ -1,6 +1,6 @@
 //choosing the right tab should be done somewhere?
 //now sending always to the active tab
-let myTab
+let myTab 
 let tabExists = false
 
 //ports for python
@@ -56,9 +56,9 @@ function rollStatus(port) {
     //send message to the tab with the video
     chrome.tabs.sendMessage(myTab, message, function(response) {
     //the content-script responds with the status message
-      console.log(response); //this is the status-object
       //send to python client
       if (response !== undefined) {
+        console.log(response); //this is the status-object
         port.postMessage("testsession1;" + JSON.stringify(response)); 
       }
     });
