@@ -2,12 +2,15 @@
 // this is derived from the key in manifest while the extension is not "published"
 
 //change override to true in case the id is not stable
-let senderOverride = true //false
+let senderOverride = false
 let extensionID = "hkkmkkadhkpbgnecfmebieppmeenefgg"
 
 //the video on _this_ page is:
 //should this be updated by some functions?
 let video = document.getElementsByTagName("video")[0];
+
+//this tab should be stored also here
+let thisTab
 
 function listener(message, sender, sendResponse) {
     if ((sender.id == extensionID) || senderOverride) {
@@ -34,8 +37,9 @@ function listener(message, sender, sendResponse) {
              //this should be forwarded to background, and only then it should start status asking  
             let bgMessage = {newTab:true, newId:message.id}
             chrome.runtime.sendMessage(bgMessage); 
-            //this part seems to work for status asking at least
-            //so that background gets status even while not focused
+
+            //write this also to "this" listeners variable
+            thisTab = message.id
         }
 
         //command calls
@@ -62,6 +66,12 @@ function listener(message, sender, sendResponse) {
             sendResponse(video.currentTime) 
         }
 
+        if (message.newUrl) {
+            console.log("change url to: ", message.urlStr)
+            //add thisTab to the message (locally saved variable)
+            message.thisTab = thisTab
+            chrome.runtime.sendMessage(message); 
+        }
 
     }
 }

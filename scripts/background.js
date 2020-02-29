@@ -1,28 +1,22 @@
-//Status-asking with a timer here
-
 //choosing the right tab should be done somewhere?
 //now sending always to the active tab
 let myTab
 
-//now getting this info popup -> listener -> background and seems to work for status
-function lockTheTab(bgMessage, sender, sendResponse) {
-  if (bgMessage.newTab) {
-    //log sender 
-    console.log(sender.id)
-    myTab = bgMessage.newId
-    console.log(myTab)
-  }
-}
+//change override to true in case the id is not stable
+let senderOverride = false
+let extensionID = "hkkmkkadhkpbgnecfmebieppmeenefgg"
+//would be smarter to import these from listener or vice versa...?
 
-//building communication popup -> background
+//building communication popup -> content -> background
 function contentMsg(message, sender, sendResponse) {
-  //lets test if these work when only declared in content
-  //if ((sender.id == extensionID) || senderOverride) {
+  if ((sender.id == extensionID) || senderOverride) {
     //the sender uses forced == true when pressed from popup
     if(message.force) {
       //the message is coming from popup
       //this should be just sent away
       
+      //TODO: put the fancy python socket here!!!
+
       //but i want to know that this exist, so
       console.log("MSG from POPUP!:")
       console.log(message)
@@ -35,19 +29,26 @@ function contentMsg(message, sender, sendResponse) {
       myTab = message.newId
       console.log(myTab)
     }
-  //}
+
+    //change url
+    if (message.newUrl) {
+      console.log(message.urlStr)
+      console.log(message.thisTab)
+      //use the saved tab, use url from popup
+      chrome.tabs.update(myTab, {url: message.urlStr})
+    }
+  }
 }
 
 //function to ask the status from listener
 function rollStatus() {
   //dont ask if no tab is locked
-  //how to disconnect?
+  //TODO: how to disconnect?
   if (myTab) {
     let message = {statusCall:true}
     //send it without quering
-    //console.log("mytab:"+ myTab)
     chrome.tabs.sendMessage(myTab, message, function(response) {
-      console.log(response) //this is the status-object
+      console.log(response) //response is the status-object
     });
   } 
 }

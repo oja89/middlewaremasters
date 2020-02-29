@@ -77,15 +77,23 @@ function lockTab() {
     myTab = tabs[0].id
     let message = {tab:true, id:myTab}
     sendMessage(message)
-    console.log("Tab id: " + myTab) //the locked tab id
+    chrome.extension.getBackgroundPage().console.log("Tab id: " + myTab) //the locked tab id
     });
 }
+
+function callUrl() {
+  let url = "https://www.youtube.com/watch?v=Ca_oJg5aThY"
+  let message = {newUrl:true, urlStr:url}
+  sendMessage(message)
+  chrome.extension.getBackgroundPage().console.log("changeUrl")
+}
+
 
 //button listeners, seems to need the 'click' name.
 document.getElementById('play').addEventListener('click', callPlay);
 document.getElementById('pause').addEventListener('click', callPause);
 //document.getElementById('status').addEventListener('click', callStatus);
-//document.getElementById('url').addEventListener('click', callUrl);
+document.getElementById('url').addEventListener('click', callUrl);
 //document.getElementById('skip').addEventListener('click', callSkip);
 document.getElementById('lock').addEventListener('click', lockTab);
 
