@@ -15,11 +15,14 @@ let extensionID = "hkkmkkadhkpbgnecfmebieppmeenefgg"
 //would be smarter to import these from listener or vice versa...?
 
 //building communication popup -> content -> background
+//function to deal with content messages:
 function contentMsg(message, sender, sendResponse) {
   if ((sender.id == extensionID) || senderOverride) {
+    
     //the sender uses forced == true when pressed from popup
+    //TODO: remove this if not used by the program
     if(message.force) {
-      //the message is coming from popup
+      //the message is coming from popup (via content)
       //this should be just sent away
       
       //TODO: put the fancy python socket here!!!
@@ -29,20 +32,23 @@ function contentMsg(message, sender, sendResponse) {
       console.log(message)
     }
 
-    //this is the "lock this tab" -message
-    if (message.newTab) {
-      //log sender 
-      console.log(sender.id)
-      myTab = message.newId
-      console.log(myTab)
-    }
-
     //change url
+    //this is also a override-function
+    //TODO: remove this
     if (message.newUrl) {
       console.log(message.urlStr)
       console.log(message.thisTab)
       //use the saved tab, use url from popup
       chrome.tabs.update(myTab, {url: message.urlStr})
+    }
+
+    //this is the "lock this tab" -message
+    //this is used!
+    if (message.newTab) {
+      //log sender 
+      console.log(sender.id)
+      myTab = message.newId
+      console.log(myTab)
     }
   }
 }
@@ -53,22 +59,20 @@ function rollStatus(port) {
   //TODO: how to disconnect?
   if (myTab) {
     let message = {statusCall:true}
-    //send it without quering
-    console.log("mytab:"+ myTab)
-      chrome.tabs.sendMessage(myTab, message, function(response) {
-        console.log(response); //this is the status-object
-        if (response !== undefined) {
-          port.postMessage("testsession1;" + JSON.stringify(response)); 
-        }
-          
-      });
-    }
+    
+    //console.log("mytab:"+ myTab)
+
+    //send message to the tab with the video
+    chrome.tabs.sendMessage(myTab, message, function(response) {
+    //the content-script responds with the status message
+      console.log(response); //this is the status-object
+      //send to python client
+      if (response !== undefined) {
+        port.postMessage("testsession1;" + JSON.stringify(response)); 
+      }
+    });
+  }
 }
-
-//intervaltime in ms
-
-//so we are running rollstatus every 1000ms with clientPort argument
-const createClock = setInterval(rollStatus, 1000, clientPort);
 
 //listener function for python messages
 function clientMsg(cMsg) {
@@ -77,23 +81,47 @@ function clientMsg(cMsg) {
   return true;
 }
 
-
-
 //msg received from the server
 function serverMsg(sMsg) {
-  //just logging atm
+
   console.log(sMsg);
 
-  //MESSAGES that are coming
-  //0 -> pause
-  //1 -> play
-  //2;12331 -> skip to 12331
-  //3;"url" -> use this url
+  let fields = sMsg.split(";")
+  let command = fields[0]
+  let value = fields[1]
 
+  if (command == 0) {
+    //ask the tab to pause
+    let message = {pauseCall:true}
+    chrome.tabs.sendMessage(myTab, message)
+  }
+  if (command == 1) {
+    //ask the tab to play
+    let message = {playCall:true}
+    chrome.tabs.sendMessage(myTab, message)
+  }
+  if (command == 2) {
+    //ask the tab to skip
+    let message = {skipCall:true, skipTime: value}
+    chrome.tabs.sendMessage(myTab, message)
+  }
+  if (sMsg == 3) {
+    //ask the tab to change url
+    //let message = {newUrl:true, urlStr: value}
+    //chrome.tabs.sendMessage(myTab, message)
+    
+    //actually we can do it just here
+    chrome.tabs.update(myTab, {url: value})
+  }
   return true;
 }
 
+//listeners and functions to actually run
 //moved to the end
+
+//so we are running rollstatus every 1000ms with clientPort argument
+const createClock = setInterval(rollStatus, 1000, clientPort);
+
 //make a listener here for the popups lock-this-tab function
 chrome.runtime.onMessage.addListener(contentMsg);
 
