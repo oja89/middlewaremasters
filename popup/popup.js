@@ -1,3 +1,11 @@
+//tab to receive the messages
+let myTab
+
+//find the bg-log
+function bgLog(message) {
+   chrome.extension.getBackgroundPage().console.log(message)
+}
+
 //actual sending function to the content script listeners here:
 function sendMessage(message) {
   chrome.tabs.sendMessage(myTab, message)
@@ -6,12 +14,13 @@ function sendMessage(message) {
 //VERY IMPORTANT PART
 //send it to listener, which can send it to background
 function lockTab() {
-  chrome.extension.getBackgroundPage().console.log("tabButton")
+  bgLog("tabButton")
   chrome.tabs.query({active: true,currentWindow:true},function(tabs){
+    //save the tab locally
     myTab = tabs[0].id
     let message = {tab:true, id:myTab}
     sendMessage(message)
-    chrome.extension.getBackgroundPage().console.log("Tab id: " + myTab) //the locked tab id
+    bgLog("Tab id: " + myTab) //the locked tab id
     });
 }
 
@@ -21,13 +30,13 @@ function lockTab() {
 //is there a need for these?
 
 function callPlay() {
-  chrome.extension.getBackgroundPage().console.log("playButton")
+  bgLog("playButton")
   let message = {force:true, playForce:true}
   sendMessage(message)
 }
 
 function callPause() {
-  chrome.extension.getBackgroundPage().console.log("pauseButton")
+  bgLog("pauseButton")
   let message = {force:true, pauseForce:true}
   sendMessage(message)
 }
@@ -42,7 +51,7 @@ function callUrl() {
   //and just force it to other clients?
   let message = {newUrl:true, urlStr:url}
   sendMessage(message)
-  chrome.extension.getBackgroundPage().console.log("changeUrl")
+  bgLog("changeUrl")
 }
 
 

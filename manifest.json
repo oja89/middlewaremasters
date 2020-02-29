@@ -23,6 +23,7 @@
   "content_scripts": [
     {
       "matches": ["https://*.youtube.com/*", "https://*.vimeo.com/*"],
+      "run_at": "document_end",
       "js": ["scripts/listener.js"]
     }
   ],
