@@ -25,7 +25,7 @@ function contentMsg(message, sender, sendResponse) {
       //the message is coming from popup (via content)
       //this should be just sent away
       
-      //TODO: put the fancy python socket here!!!
+      //TODO: send to python?
 
       //but i want to know that this exist, so
       console.log("MSG from POPUP!:")
@@ -33,7 +33,6 @@ function contentMsg(message, sender, sendResponse) {
     }
 
     //change url
-    //this is also a override-function
     //TODO: remove this
     if (message.newUrl) {
       console.log(message.urlStr)
@@ -77,11 +76,12 @@ function rollStatus(port) {
 //listener function for python messages
 function clientMsg(cMsg) {
   //just logging atm
+  //TODO: whatever needs to be done
   console.log(cMsg);
   return true;
 }
 
-//msg received from the server
+//parse the msg received from the server
 function serverMsg(sMsg) {
 
   console.log(sMsg);
@@ -116,8 +116,7 @@ function serverMsg(sMsg) {
   return true;
 }
 
-//listeners and functions to actually run
-//moved to the end
+//Start the listeners, and the asking function
 
 //so we are running rollstatus every 1000ms with clientPort argument
 const createClock = setInterval(rollStatus, 1000, clientPort);

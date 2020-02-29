@@ -1,12 +1,10 @@
 //just to make sure that the sender is actually this extension
 // this is derived from the key in manifest while the extension is not "published"
-
 //change override to true in case the id is not stable
 let senderOverride = false
 let extensionID = "hkkmkkadhkpbgnecfmebieppmeenefgg"
 
 //the video on _this_ page is:
-//should this be updated by some functions?
 let video = document.getElementsByTagName("video")[0];
 
 //this tab should be stored also here
@@ -44,7 +42,7 @@ function listener(message, sender, sendResponse) {
         }
 
         //command calls
-        //these should now come from the python script
+        //background gets the python commands and forwards them
 
         if (message.playCall) {
             video.play();
@@ -57,6 +55,7 @@ function listener(message, sender, sendResponse) {
             video.pause();
             console.log("!pause,", "paused: ", video.paused)
             //check video status and return it
+            //TODO: remove response if not used
             sendResponse(video.paused) 
         }
 
@@ -85,11 +84,13 @@ function getStatus(video) {
     //create the object
     let status = {}
     
+    //build a timestamp (probly not needed)
+    //TODO: remove if needed
     timestamp += 1
     status.timestamp = timestamp 
 
     //use the same "commands" as the video commands for clarity plz
-    status.src = video.src //this is not same if different url
+    //status.src = video.src //this is not same if different url
     if (video.paused == false) {
         status.paused = 0;
     }
@@ -104,5 +105,5 @@ function getStatus(video) {
     return status
 }
 
-//this listens to the messages
+//start the message listener (for bg and popup messages)
 chrome.runtime.onMessage.addListener(listener);
