@@ -7,9 +7,6 @@ let extensionID = "hkkmkkadhkpbgnecfmebieppmeenefgg"
 //the video on _this_ page is:
 let video = document.getElementsByTagName("video")[0];
 
-//this tab should be stored also here
-let thisTab
-
 //handling with the messages received from the background or popup
 function listener(message, sender, sendResponse) {
     if ((sender.id == extensionID) || senderOverride) {
@@ -22,11 +19,9 @@ function listener(message, sender, sendResponse) {
         //status roller
         if (message.statusCall) {             
             //run the status function
-                //show the object in log
-                currentStatus = getStatus(video)
-                console.log(currentStatus)
-                //send back
-                sendResponse(currentStatus)
+            currentStatus = getStatus(video)
+            //send back
+            sendResponse(currentStatus)
         }
         
         //tab-selector
@@ -36,12 +31,9 @@ function listener(message, sender, sendResponse) {
              //this should be forwarded to background, and only then it should start status asking  
             let bgMessage = {newTab:true, newId:message.id}
             chrome.runtime.sendMessage(bgMessage); 
-
-            //write this also to "this" listeners variable
-            thisTab = message.id
         }
 
-        //command calls
+        //COMMANDS FROM BACKGROUND, modify player state:
         //background gets the python commands and forwards them
 
         if (message.playCall) {
@@ -54,43 +46,27 @@ function listener(message, sender, sendResponse) {
         if (message.pauseCall) {
             video.pause();
             console.log("!pause,", "paused: ", video.paused)
-            //check video status and return it
-            //TODO: remove response if not used
-            sendResponse(video.paused) 
         }
 
         if (message.skipCall) {
             video.currentTime = message.skipTime; //skip somewhere
             console.log("!skip to: " + message.skipTime,"new time is: "+ video.currentTime)
-            //check video status and return it
-            sendResponse(video.currentTime) 
         }
 
         if (message.newUrl) {
             console.log("change url to: ", message.urlStr)
-            //add thisTab to the message (locally saved variable)
-            message.thisTab = thisTab
             chrome.runtime.sendMessage(message); 
         }
 
     }
 }
 
-
-//test rolling a logical number clock
-let timestamp = 0
 //this function fetches the statuses from the video
 function getStatus(video) {
     //create the object
     let status = {}
-    
-    //build a timestamp (probly not needed)
-    //TODO: remove if needed
-    timestamp += 1
-    status.timestamp = timestamp 
 
     //use the same "commands" as the video commands for clarity plz
-    //status.src = video.src //this is not same if different url
     if (video.paused == false) {
         status.paused = 0;
     }
@@ -98,8 +74,6 @@ function getStatus(video) {
         status.paused = 1;
     }
     status.currentTime = video.currentTime
-    status.playbackRate = video.playbackRate
-    status.readyState = video.readyState
     status.baseURI = video.baseURI
 
     return status
