@@ -83,6 +83,7 @@ let timestamp = 0
 function getStatus(video) {
     //create the object
     let status = {}
+    
     timestamp += 1
     status.timestamp = timestamp 
 

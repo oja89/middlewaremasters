@@ -67,11 +67,12 @@ function rollStatus(port) {
 //intervaltime in ms
 
 //dont really know how this port-thing fits here, but lets see
-const createClock = setInterval(rollStatus, 1000, port);
+const createClock = setInterval(rollStatus, 6000, port);
 
 //listener function for python messages
-function msgGot(message) {
-  console.log(message);
+function msgGot(pyMessage) {
+  //just logging atm
+  console.log(pyMessage);
   return true;
 }
 

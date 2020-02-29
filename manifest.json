@@ -17,7 +17,7 @@
   },
 
   "background": {
-    "scripts": ["scripts/background.js", "scripts/ytsdiscovery.js"]
+    "scripts": ["scripts/background.js", "scripts/bgCommands.js"]
   },
 
   "content_scripts": [
