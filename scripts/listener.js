@@ -12,6 +12,7 @@ let video = document.getElementsByTagName("video")[0];
 //this tab should be stored also here
 let thisTab
 
+//handling with the messages received from the background or popup
 function listener(message, sender, sendResponse) {
     if ((sender.id == extensionID) || senderOverride) {
         //if it is a force-message, just send it forward
