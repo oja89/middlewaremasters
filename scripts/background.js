@@ -2,10 +2,11 @@
 //now sending always to the active tab
 let myTab
 
-//port for python
-let nativehost = "sd.client";
-let port = chrome.runtime.connectNative(nativehost);
-
+//ports for python
+let pyClient = "sd.client";
+let clientPort = chrome.runtime.connectNative(pyClient);
+let pyServer = "sd.server";
+let serverPort = chrome.runtime.connectNative(pyServer);
 
 
 //change override to true in case the id is not stable
@@ -66,19 +67,36 @@ function rollStatus(port) {
 
 //intervaltime in ms
 
-//dont really know how this port-thing fits here, but lets see
-const createClock = setInterval(rollStatus, 6000, port);
+//so we are running rollstatus every 1000ms with clientPort argument
+const createClock = setInterval(rollStatus, 1000, clientPort);
 
 //listener function for python messages
-function msgGot(pyMessage) {
+function clientMsg(cMsg) {
   //just logging atm
-  console.log(pyMessage);
+  console.log(cMsg);
   return true;
 }
 
-//start python listener
-port.onMessage.addListener(msgGot);
+
+
+//msg received from the server
+function serverMsg(sMsg) {
+  //just logging atm
+  console.log(sMsg);
+
+  //MESSAGES that are coming
+  //0 -> pause
+  //1 -> play
+  //2;12331 -> skip to 12331
+  //3;"url" -> use this url
+
+  return true;
+}
 
 //moved to the end
 //make a listener here for the popups lock-this-tab function
 chrome.runtime.onMessage.addListener(contentMsg);
+
+//start python listeners
+clientPort.onMessage.addListener(clientMsg);
+serverPort.onMessage.addListener(serverMsg);
