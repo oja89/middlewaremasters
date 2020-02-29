@@ -6,7 +6,6 @@
 //we are always sending to the current tab, that should be stored and updated
 let myTab
 
-//The button configurations and functions start here
 //actual sending function to the content script listeners here:
 function sendMessage(message) {
      chrome.tabs.sendMessage(myTab, message, function(response) {
@@ -16,6 +15,7 @@ function sendMessage(message) {
     chrome.extension.getBackgroundPage().console.log("sent message to tab: " + myTab)
 }
 
+//The button configurations and functions start here
 //These are the new ones from popup which need to be send forward to background
 function callPlay() {
   chrome.extension.getBackgroundPage().console.log("playButton")
@@ -46,8 +46,8 @@ function callUrl() {
   let url = "https://www.youtube.com/watch?v=Ca_oJg5aThY"
   //TODO:
   //url should be changed to be the one that is active on this tab?
-  //or which is input somewhere
-  //and just force it to other clients
+  //or which is input somewhere?
+  //and just force it to other clients?
   let message = {newUrl:true, urlStr:url}
   sendMessage(message)
   chrome.extension.getBackgroundPage().console.log("changeUrl")
