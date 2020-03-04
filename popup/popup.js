@@ -61,3 +61,36 @@ document.getElementById('pause').addEventListener('click', callPause);
 document.getElementById('url').addEventListener('click', callUrl);
 document.getElementById('lock').addEventListener('click', lockTab);
 
+//Stuff for the session buttons creation
+var info = [{
+  "sessionName": "Session",
+  "sessionNumber": "JFJFJFJFJF2332323232"
+}, {
+  "sessionName": "Session",
+  "sessionNumber": "2"
+}, {
+  "sessionName": "Session",
+  "sessionNumber": "3"
+}];
+var table = document.getElementById("table");
+var storageLength = info.length;
+
+for (var i = 0; i < info.length; i++) {
+  var row = table.insertRow(i + 1);
+  var cell1 = row.insertCell(0);
+  var cell2 = row.insertCell(1);
+  var cell3 = row.insertCell(2);
+
+  cell1.innerHTML = info[i].sessionName;
+  cell2.innerHTML = info[i].sessionNumber;
+
+  var joinButtonHTML = "<input type=button value=Join class=join id=join-button" + (i + 1) + ">";
+  cell3.innerHTML = joinButtonHTML;
+  cell3.addEventListener("click", function(event) {
+  	var currentId = event.target.id;
+    // Change the id (last character, some tweak)
+    alert(event.target.id); // Before
+    event.target.id = event.target.id[event.target.id.length - 1];
+    alert(event.target.id); // After
+  }); 
+}
