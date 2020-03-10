@@ -208,12 +208,14 @@ while True:
         if sessionid != session:
             continue
         
-        if obj == 0:
+        if obj == "0":
             #Force pause command
             send_message(str(PAUSE))
-        elif obj == 1:
+            continue
+        elif obj == "1":
             #Force play command
             send_message(str(PLAY))
+            continue
         try:
             json_obj = json.loads(obj)
         except ValueError:

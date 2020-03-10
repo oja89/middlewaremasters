@@ -2,6 +2,8 @@
 //now sending always to the active tab
 let myTab 
 let tabExists = false
+let sessionslist = {}
+let currentSession;
 
 //ports for python
 let pyClient = "sd.client";
@@ -29,9 +31,14 @@ function contentMsg(message, sender, sendResponse) {
       console.log(myTab)
     }
 
+    if (message.joinsess) {
+      currentSession = message.joinsess;
+    }
+
     //the message is coming from popup (via content) 
-    if(message.force) {
+    if(message === 0 || message === 1) {
       //TODO: send to python?
+      clientPort.postMessage(currentSession + ';' + message);
     }
 
     //change url
@@ -59,10 +66,16 @@ function rollStatus(port) {
       //send to python client
       if (response !== undefined) {
         console.log(response); //this is the status-object
-        port.postMessage("testsession1;" + JSON.stringify(response)); 
+        if (currentSession) {
+          port.postMessage(currentSession + ';' + JSON.stringify(response)); 
+        }
       }
     });
   }
+}
+
+function sendSessions() {
+  chrome.runtime.sendMessage(sessionslist)
 }
 
 //checker function that the myTab tabExists
@@ -120,6 +133,10 @@ function serverMsg(sMsg) {
   let command = fields[0]
   let value = fields[1]
 
+  if (command == "sessions") {
+    sessionslist = JSON.parse(value);
+  }
+
   if (command == 0) {
     //ask the tab to pause
     let message = {pauseCall:true}
@@ -156,6 +173,7 @@ function serverMsg(sMsg) {
 
 //so we are running rollstatus every 1000ms with clientPort argument
 setInterval(rollStatus, 1000, clientPort);
+setInterval(sendSessions, 1000);
 
 //make a listener here for the popups lock-this-tab function
 chrome.runtime.onMessage.addListener(contentMsg);

@@ -12,6 +12,7 @@ function listener(message, sender, sendResponse) {
     if ((sender.id == extensionID) || senderOverride) {
         //if it is a force-message, just send it forward
         //(popup to background)
+        
         if (message.force) {
             chrome.runtime.sendMessage(message); 
         }
@@ -59,6 +60,7 @@ function listener(message, sender, sendResponse) {
         }
 
     }
+    return true;
 }
 
 //this function fetches the statuses from the video
