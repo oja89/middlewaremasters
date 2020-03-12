@@ -61,6 +61,7 @@ sessions = []
 
 #Log file
 f= open("log_" + str(time.time()).split(".")[0],"a+")
+rowcount = 0
 
 
 while True:
@@ -71,6 +72,11 @@ while True:
         send_message("Received " + data)
         f.write(data + "\n")
         f.flush()
+        rowcount+=1
+        if rowcount > 5000:
+            #New log file
+            f.close()
+            f= open("log_" + str(time.time()).split(".")[0],"a+")
         
     #Application logic
     except BlockingIOError:
