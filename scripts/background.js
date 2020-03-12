@@ -1,7 +1,7 @@
-//choosing the right tab should be done somewhere?
-//now sending always to the active tab
 let myTab 
 let tabExists = false
+let sessionslist = {}
+let currentSession;
 
 //ports for python
 let pyClient = "sd.client";
@@ -13,15 +13,14 @@ let serverPort = chrome.runtime.connectNative(pyServer);
 //change override to true in case the id is not stable
 let senderOverride = false
 let extensionID = "hkkmkkadhkpbgnecfmebieppmeenefgg"
-//would be smarter to import these from listener or vice versa...?
 
 //building communication popup -> content -> background
 //function to deal with content messages:
 function contentMsg(message, sender, sendResponse) {
   if ((sender.id == extensionID) || senderOverride) {
+    
     //this is the "lock this tab" -message
     //this is used!
-    
     if (message.newTab) {
       //log sender 
       console.log(sender.id)
@@ -29,13 +28,21 @@ function contentMsg(message, sender, sendResponse) {
       console.log(myTab)
     }
 
+    //When the user decides to join a session
+    if (message.joinsess) {
+      currentSession = message.joinsess;
+    }
+
+    /**
+     * The last two are currently not used
+     */
     //the message is coming from popup (via content) 
-    if(message.force) {
+    if(message === 0 || message === 1) {
       //TODO: send to python?
+      clientPort.postMessage(currentSession + ';' + message);
     }
 
     //change url
-    //TODO: is this needed in the final product
     if (message.newUrl) {
       console.log("new url: ", message.urlStr)
       //use the saved tab, use url from popup
@@ -47,7 +54,6 @@ function contentMsg(message, sender, sendResponse) {
 //function to ask the status from listener
 function rollStatus(port) {
   //dont ask if no tab is locked
-  //TODO: how to disconnect?
   if (checkTab(myTab)) {
     let message = {statusCall:true}
     
@@ -59,13 +65,22 @@ function rollStatus(port) {
       //send to python client
       if (response !== undefined) {
         console.log(response); //this is the status-object
-        port.postMessage("testsession1;" + JSON.stringify(response)); 
+        if (currentSession) {
+          port.postMessage(currentSession + ';' + JSON.stringify(response)); 
+        }
       }
     });
   }
 }
 
-//checker function that the myTab tabExists
+/*
+ * Send the sessions list to popup
+ */
+function sendSessions() {
+  chrome.runtime.sendMessage(sessionslist)
+}
+
+//checker function that the myTab tab exists
 //maybe not the cleanest, but works...
 function checkTab(myTab) {
   
@@ -111,6 +126,10 @@ function clientMsg(cMsg) {
   return true;
 }
 
+
+//Date variable to make sure the browser is not bombarded with commands
+let oldtime = new Date();
+
 //parse the msg received from the server
 function serverMsg(sMsg) {
 
@@ -120,34 +139,58 @@ function serverMsg(sMsg) {
   let command = fields[0]
   let value = fields[1]
 
+  //Update sessions list
+  if (command == "sessions") {
+    sessionslist = JSON.parse(value);
+  }
+
+  //Pause command
   if (command == 0) {
     //ask the tab to pause
     let message = {pauseCall:true}
-    if (checkTab(myTab)) {
-      chrome.tabs.sendMessage(myTab, message)
-    }
+    //Check that at least 2 seconds since last command sent
+    if ((new Date() - oldtime) > 2000) {
+      if (checkTab(myTab)) {
+        chrome.tabs.sendMessage(myTab, message)
+        oldtime = new Date();
+      }}
   }
+
+  //Play command
   if (command == 1) {
     //ask the tab to play
     let message = {playCall:true}
+    //Check that at least 2 seconds since last command sent
+    if ((new Date() - oldtime) > 2000) {
     if (checkTab(myTab)) {
       chrome.tabs.sendMessage(myTab, message)
-    }
+      oldtime = new Date();
+    }}
   }
+
+  //Skip to a point in the video
   if (command == 2) {
     //ask the tab to skip
     let message = {skipCall:true, skipTime: value}
+    //Check that at least 2 seconds since last command sent
+    if ((new Date() - oldtime) > 2000) {
     if (checkTab(myTab)) {
       chrome.tabs.sendMessage(myTab, message)
-    }
+      oldtime = new Date();
+    }}
   }
+
+  //Change URL
   if (command == 3) {
     //ask the tab to change url
     //check that it exists...
 
+    //Check that at least 2 seconds since last command sent
+    if ((new Date() - oldtime) > 2000) {
     if (checkTab(myTab)) {
       chrome.tabs.update(myTab, {url: value})
-    }
+      oldtime = new Date();
+    }}
   }
   return true;
 }
@@ -156,6 +199,8 @@ function serverMsg(sMsg) {
 
 //so we are running rollstatus every 1000ms with clientPort argument
 setInterval(rollStatus, 1000, clientPort);
+//Update sessions every 1000 ms
+setInterval(sendSessions, 1000);
 
 //make a listener here for the popups lock-this-tab function
 chrome.runtime.onMessage.addListener(contentMsg);

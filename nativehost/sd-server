@@ -21,6 +21,7 @@ if sys.platform == "win32":
     msvcrt.setmode(sys.stdin.fileno(), os.O_BINARY)
     msvcrt.setmode(sys.stdout.fileno(), os.O_BINARY)
 
+#Get own ip address
 def get_dev_ipaddr():
     testsock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     testsock.connect(("8.8.8.8", 80))
@@ -28,6 +29,7 @@ def get_dev_ipaddr():
     testsock.close()
     return ipaddr
 
+#Create a multicast socket
 def listen_socket():
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
     sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -36,6 +38,7 @@ def listen_socket():
     sock.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, mreq)
     return sock
 
+#Send message to background script
 def send_message(message):
     #Modified from https://github.com/mdn/webextensions-examples/tree/master/native-messaging
     encodedMessage = json.dumps(message).encode('utf-8')
@@ -56,24 +59,29 @@ session = False
 nodecommands = collections.defaultdict(list)
 sessions = []
 
+#Log file
+f= open("log_" + str(time.time()).split(".")[0],"a+")
+
+
 while True:
+    #Get messages from the socket buffer
     try:
         data, client = sock.recvfrom(10240)
         data = data.decode("utf-8")
         send_message("Received " + data)
-        #print(data)
-        #sock.sendto("Viesti saatu joten vastataan HÖHÖ".encode("utf-8"), (MCAST_ADDR, MCAST_PORT))
-
+        f.write(data + "\n")
+        f.flush()
+        
+    #Application logic
     except BlockingIOError:
-        #send_message("No message, analyzing statuses")
+        
         time.sleep(0.1)
         swarmsize = len(nodes) #how many nodes in group
         if swarmsize == 0:
             #nothing happening
             continue
         #No message in buffer
-        #print("No message")
-        #TODO: Add application logic here
+        
 
         #Check status of nodecommands
         #if this node has to do something, send message to extension
@@ -208,12 +216,14 @@ while True:
         if sessionid != session:
             continue
         
-        if obj == 0:
+        if obj == "0":
             #Force pause command
             send_message(str(PAUSE))
-        elif obj == 1:
+            continue
+        elif obj == "1":
             #Force play command
             send_message(str(PLAY))
+            continue
         try:
             json_obj = json.loads(obj)
         except ValueError:

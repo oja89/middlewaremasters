@@ -12,7 +12,7 @@ Currently askes for the status with "messages" once per sec.
 ## popup.js:
 
 Communicates with the popup.html
-Send "messages" to content scripts
+Send "messages" to background script
 It is conveniently located in the popup-folder
 
 # Content scripts:
@@ -22,11 +22,7 @@ These are ran when the url matches the given criteria
 
 ## listener.js:
 
-Listens for the commands from popup.js
-Commands are sent as objects.
-
-Gives the command to the video element.
-Currently answers for the status button by popup.js and the cyclical status asking from background.js
+Currently answers to the cyclical video status asking from background.js
 
 
 

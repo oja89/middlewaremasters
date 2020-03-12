@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 
-print("alko")
 
 import socket
 import time
@@ -18,9 +17,11 @@ if sys.platform == "win32":
     msvcrt.setmode(sys.stdin.fileno(), os.O_BINARY)
     msvcrt.setmode(sys.stdout.fileno(), os.O_BINARY)
 
+#Get the messages from background script 
 def getMessage():
     #From https://github.com/mdn/webextensions-examples/tree/master/native-messaging
     rawLength = sys.stdin.buffer.read(4)
+    #Quit condition
     if len(rawLength) == 0:
         sys.exit(0)
     messageLength = struct.unpack('@I', rawLength)[0]
@@ -46,5 +47,7 @@ sock = createSocket()
 
 while True:
     send_message("loop in client")
+    #Wait for messages from background script
     extmessage = getMessage()
+    #Multicast the message 
     sock.sendto(extmessage.encode("utf-8"), (MCAST_ADDR, MCAST_PORT))
