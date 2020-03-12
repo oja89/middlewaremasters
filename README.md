@@ -28,7 +28,10 @@ everyone's video will pause.
 ## In addition
 
 On the extensions page you can select to open the background page of the extension.
-Use that to see the console.log from background.js script. That log shows the messages and commands received in the current session.
+Use that to see the console.log from background.js script. That log shows the messages and commands received in the current session. This is 
+a very useful debugging tool. If the tab is not chosen, it will print "Tab not locked".
+
+Sd-server creates log files in the nativehost directory. 
 
 On youtube-tab, you can press "F12" to open the console.
 It shows the console from the content scripts (listener.js)
