@@ -124,6 +124,9 @@ function clientMsg(cMsg) {
   return true;
 }
 
+
+let oldtime = new Date();
+
 //parse the msg received from the server
 function serverMsg(sMsg) {
 
@@ -140,31 +143,39 @@ function serverMsg(sMsg) {
   if (command == 0) {
     //ask the tab to pause
     let message = {pauseCall:true}
-    if (checkTab(myTab)) {
-      chrome.tabs.sendMessage(myTab, message)
-    }
+    if ((new Date() - oldtime) > 2000) {
+      if (checkTab(myTab)) {
+        chrome.tabs.sendMessage(myTab, message)
+        oldtime = new Date();
+      }}
   }
   if (command == 1) {
     //ask the tab to play
     let message = {playCall:true}
+    if ((new Date() - oldtime) > 2000) {
     if (checkTab(myTab)) {
       chrome.tabs.sendMessage(myTab, message)
-    }
+      oldtime = new Date();
+    }}
   }
   if (command == 2) {
     //ask the tab to skip
     let message = {skipCall:true, skipTime: value}
+    if ((new Date() - oldtime) > 2000) {
     if (checkTab(myTab)) {
       chrome.tabs.sendMessage(myTab, message)
-    }
+      oldtime = new Date();
+    }}
   }
   if (command == 3) {
+    //console.log(new Date() - oldtime)
     //ask the tab to change url
     //check that it exists...
-
+    if ((new Date() - oldtime) > 2000) {
     if (checkTab(myTab)) {
       chrome.tabs.update(myTab, {url: value})
-    }
+      oldtime = new Date();
+    }}
   }
   return true;
 }
