@@ -12,7 +12,9 @@ function listener(message, sender, sendResponse) {
     if ((sender.id == extensionID) || senderOverride) {
         //if it is a force-message, just send it forward
         //(popup to background)
-        
+
+
+        //not used 
         if (message.force) {
             chrome.runtime.sendMessage(message); 
         }
@@ -53,7 +55,7 @@ function listener(message, sender, sendResponse) {
             video.currentTime = message.skipTime; //skip somewhere
             console.log("!skip to: " + message.skipTime,"new time is: "+ video.currentTime)
         }
-
+        //not used    
         if (message.newUrl) {
             console.log("change url to: ", message.urlStr)
             chrome.runtime.sendMessage(message); 

@@ -11,12 +11,12 @@ function getRndInteger(min, max) {
   return Math.floor(Math.random() * (max - min + 1) ) + min;
 }
 
-//actual sending function to the content script listeners here:
+//actual sending function to the content script listeners here
+//Not used anymore
 function sendMessage(message) {
   chrome.tabs.sendMessage(myTab, message)
 }
 //locking the tab-variable
-//VERY IMPORTANT PART
 //send it to listener, which can send it to background
 function lockTab() {
   bgLog("tabButton")
@@ -32,7 +32,6 @@ function lockTab() {
 //The button configurations and functions start here
 //These are the new ones from popup which need to be send forward to background
 
-//is there a need for these?
 
 function callPlay() {
   bgLog("playButton")
@@ -65,7 +64,9 @@ function callUrl() {
   bgLog("changeUrl")
 }*/
 
-
+/*
+* Listen to the messages from background script that contain sessions list
+*/
 chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
   bgLog(message);
   if (message.sessions) {
@@ -78,6 +79,7 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
     }
     var storageLength = info.length;
 
+    //Show the sessions to the user in the popup and create join buttons
     for (var i = 0; i < info.length; i++) {
       var row = table.insertRow(i + 1);
       var cell1 = row.insertCell(0);
@@ -100,7 +102,7 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
 });
 
 
-//button listeners, seems to need the 'click' name.
+//button listeners
 document.getElementById('play').addEventListener('click', callPlay);
 document.getElementById('pause').addEventListener('click', callPause);
 document.getElementById('create').addEventListener('click', newSession);
